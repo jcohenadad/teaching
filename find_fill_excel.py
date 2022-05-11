@@ -17,22 +17,34 @@ wb2 = xl.load_workbook(filename1)
 ws2 = wb2.active
 col_id_dest = 1
 col_val_dest = 9
-row_start_dest = 11
+# row_start_dest = 11
 
-# calculate total number of rows and
-# columns in source excel file
-mr = ws1.max_row
-mc = ws1.max_column
+# Loop across rows from the src file
+n_row_src = ws1.max_row
 
 # copying the cell values from source
 # excel file to destination excel file
-for i in range (1, mr + 1):
-	for j in range (1, mc + 1):
-		# reading cell value from source excel file
-		c = ws1.cell(row = i, column = j)
+for i in range(row_start_src+1, n_row_src + 1):
+	# Read index value from source file
+	id = ws1.cell(row=i, column=col_id_src).value
+	# Read value from source file
+	val = ws1.cell(row=i, column=col_val_src).value
+	# Find index from dest file
+	found = False
+	for row in ws2.rows:
+		for cell in row:
+			if cell.value == val:
+				print("Found!")
+				found = True
+	if not found:
+		print("Not found :-(")
 
-		# writing the read value to destination excel file
-		ws2.cell(row = i, column = j).value = c.value
+		#
+		# # reading cell value from source excel file
+		# c = ws1.cell(row = i, column = j)
+		#
+		# # writing the read value to destination excel file
+		# ws2.cell(row = i, column = j).value = c.value
 
 # saving the destination excel file
 wb2.save(str(filename1))
