@@ -18,8 +18,10 @@ filename1 = "/Users/julien/Desktop/dest.xlsx"
 wb2 = xl.load_workbook(filename1)
 ws2 = wb2.active
 col_id_dest = 1
-col_val_dest = 9
+col_val_dest = 4
 # row_start_dest = 11
+
+file_out = "/Users/julien/Desktop/dest_modif.xlsx"
 
 # Loop across rows from the src file
 n_row_src = ws1.max_row
@@ -40,7 +42,8 @@ for i in range(row_start_src+1, n_row_src + 1):
 			if cell == id:
 				print("Found!")
 				found = True
-
+				# Assign value in destination cell
+				ws2.cell(i_row, col_val_dest).value = val
 				break
 	if not found:
 		logger.error("Not found :-(")
@@ -53,4 +56,4 @@ for i in range(row_start_src+1, n_row_src + 1):
 		# ws2.cell(row = i, column = j).value = c.value
 
 # saving the destination excel file
-wb2.save(str(filename1))
+wb2.save(file_out)
