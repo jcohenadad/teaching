@@ -16,10 +16,10 @@ logger.add(sys.stderr, level="INFO")
 filename = "/Users/julien/Desktop/src.xlsx"
 # WARNING!!! Starts at 1
 col_id_src = 3
-col_val_src = 9
+col_val_src = 7
 row_start_src = 1
-wb1 = xl.load_workbook(filename)
-ws1 = wb1.worksheets[0]
+wb1 = xl.load_workbook(filename, read_only=True)
+ws1 = wb1.active
 
 # opening the destination excel file
 filename1 = "/Users/julien/Desktop/dest.xlsx"
@@ -33,6 +33,7 @@ file_out = "/Users/julien/Desktop/dest_modif.xlsx"
 
 # Loop across rows from the src file
 n_row_src = ws1.max_row
+
 
 def invalid_cell(value):
     """
