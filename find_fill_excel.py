@@ -1,8 +1,12 @@
 
 # importing openpyxl module
+import sys
 import openpyxl as xl
 from loguru import logger
 
+
+logger.remove()
+logger.add(sys.stderr, level="INFO")
 
 # opening the source excel file
 filename = "/Users/julien/Desktop/src.xlsx"
@@ -40,7 +44,6 @@ for i in range(row_start_src+1, n_row_src + 1):
 			cell = ws2.cell(i_row, i_col).value
 			logger.debug(f"id: {id} | Cell ({i_row}, {i_col}): {cell}")
 			if cell == id:
-				print("Found!")
 				found = True
 				# Assign value in destination cell
 				ws2.cell(i_row, col_val_dest).value = val
