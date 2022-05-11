@@ -33,14 +33,17 @@ for i in range(row_start_src+1, n_row_src + 1):
 	val = ws1.cell(row=i, column=col_val_src).value
 	# Find index from dest file
 	found = False
-	for row in ws2.rows:
-		for cell in row:
-			logger.debug(f"id: {id} | Cell value: {cell.value}")
-			if cell.value == val:
+	for i_row in range(1, ws2.max_row + 1):
+		for i_col in range(1, ws2.max_column + 1):
+			cell = ws2.cell(i_row, i_col).value
+			logger.debug(f"id: {id} | Cell ({i_row}, {i_col}): {cell}")
+			if cell == id:
 				print("Found!")
 				found = True
+
+				break
 	if not found:
-		print("Not found :-(")
+		logger.error("Not found :-(")
 
 		#
 		# # reading cell value from source excel file
