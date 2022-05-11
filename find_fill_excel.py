@@ -48,12 +48,5 @@ for i in range(row_start_src+1, n_row_src + 1):
 	if not found:
 		logger.error("Not found :-(")
 
-		#
-		# # reading cell value from source excel file
-		# c = ws1.cell(row = i, column = j)
-		#
-		# # writing the read value to destination excel file
-		# ws2.cell(row = i, column = j).value = c.value
-
 # saving the destination excel file
 wb2.save(file_out)
