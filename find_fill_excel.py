@@ -4,7 +4,6 @@ This script finds the value of a source EXCEL file and insert it in a destinatio
  a column specified in this script (eg: the matricule of a student). The file should be edited to customize it.
 """
 
-# importing openpyxl module
 import sys
 import openpyxl as xl
 from loguru import logger
@@ -16,7 +15,7 @@ logger.add(sys.stderr, level="INFO")
 filename = "/Users/julien/Desktop/src.xlsx"
 # WARNING!!! Starts at 1
 col_id_src = 3
-col_val_src = 7
+col_val_src = 9
 row_start_src = 1
 wb1 = xl.load_workbook(filename, read_only=True)
 ws1 = wb1.active
@@ -32,7 +31,11 @@ col_val_dest = 4
 file_out = "/Users/julien/Desktop/dest_modif.xlsx"
 
 # Loop across rows from the src file
-n_row_src = ws1.max_row
+# This is a workaround found in https://localcoder.org/openpyxl-max-row-and-max-column-wrongly-reports-a-larger-figure
+#  to address the problem of ws1.max_row outputting 'None' sometimes.
+for n_row_src, row in enumerate(ws1, 1):
+    if all(c.value is None for c in row):
+        break
 
 
 def invalid_cell(value):
