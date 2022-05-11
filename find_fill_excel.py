@@ -1,6 +1,8 @@
 
 # importing openpyxl module
 import openpyxl as xl
+from loguru import logger
+
 
 # opening the source excel file
 filename = "/Users/julien/Desktop/src.xlsx"
@@ -33,6 +35,7 @@ for i in range(row_start_src+1, n_row_src + 1):
 	found = False
 	for row in ws2.rows:
 		for cell in row:
+			logger.debug(f"id: {id} | Cell value: {cell.value}")
 			if cell.value == val:
 				print("Found!")
 				found = True
