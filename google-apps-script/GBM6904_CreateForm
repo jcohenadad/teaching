@@ -31,3 +31,11 @@ function createForm() {
        .setTitle(item)  
        .setChoiceValues(choices);  
  }
+
+ function getValueFromGoogleSheet() {
+  var ss= SpreadsheetApp.openById('15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I');
+  var questionSheet = ss.getSheetByName('Sheet1');
+  var returnData = questionSheet.getDataRange().getValues();
+  debugger
+  return returnData;
+}
