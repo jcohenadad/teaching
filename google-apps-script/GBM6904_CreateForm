@@ -1,41 +1,74 @@
-function createForm() {  
-   // create & name Form  
-   var item = "Speaker Information Form";  
-   var form = FormApp.create(item)  
-       .setTitle(item);  
-   
-   // single line text field  
-   item = "Name, Title, Organization";  
-   form.addTextItem()  
-       .setTitle(item)  
-       .setRequired(true);  
-   
-   // multi-line "text area"  
-   item = "Short biography (4-6 sentences)";  
-   form.addParagraphTextItem()  
-       .setTitle(item)  
-       .setRequired(true);  
-   
-   // radiobuttons  
-   item = "Handout format";  
-   var choices = ["1-Pager", "Stapled", "Soft copy (PDF)", "none"];  
-   form.addMultipleChoiceItem()  
-       .setTitle(item)  
-       .setChoiceValues(choices)  
-       .setRequired(true);  
-   
-   // (multiple choice) checkboxes  
-   item = "Microphone preference (if any)";  
-   choices = ["wireless/lapel", "handheld", "podium/stand"];  
-   form.addCheckboxItem()  
-       .setTitle(item)  
-       .setChoiceValues(choices);  
- }
 
- function getValueFromGoogleSheet() {
+// Useful info: 
+// - https://cloud.google.com/blog/products/application-development/auto-generating-google-forms
+// - https://codewithcurt.com/populate-options-on-google-forms-from-google-sheets/
+
+function createForm() {
+  // Fetch names of all students
+  var googleSheetsValues = getValueFromGoogleSheet();
+  // Loop across students
+  for(j = 1; j < googleSheetsValues.length; j++)
+  {
+      // create & name Form
+      var item = googleSheetsValues[j][0];
+      var form = FormApp.create(item).setTitle(item);
+    // (googleSheetsValues[j][header_index] != '') ? choiceArray.push(googleSheetsValues[j][header_index]) : null;
+  }
+
+//   googleSheetsValues[0].forEach(function(header_value, header_index) {
+//     if(header_value == item.getTitle())
+//     {
+//       var choiceArray = [];
+//       for(j = 1; j < googleSheetsValues.length; j++)
+//       {
+//         (googleSheetsValues[j][header_index] != '') ? choiceArray.push(googleSheetsValues[j][header_index]) : null;
+//       }
+//       item.asMultipleChoiceItem().setChoiceValues(choiceArray);
+//       // If using Dropdown Questions use line below instead of line above.
+//       //item.asListItem().setChoiceValues(choiceArray);
+//     }
+//   });     
+
+
+//   var itemsArray = form.getItems();
+//   itemsArray.forEach(function(item){
+//   });
+
+
+//    // single line text field  
+//    item = "Name, Title, Organization";  
+//    form.addTextItem()  
+//        .setTitle(item)  
+//        .setRequired(true);  
+   
+//    // multi-line "text area"  
+//    item = "Short biography (4-6 sentences)";  
+//    form.addParagraphTextItem()  
+//        .setTitle(item)  
+//        .setRequired(true);  
+   
+//    // radiobuttons  
+//    item = "Handout format";  
+//    var choices = ["1-Pager", "Stapled", "Soft copy (PDF)", "none"];  
+//    form.addMultipleChoiceItem()  
+//        .setTitle(item)  
+//        .setChoiceValues(choices)  
+//        .setRequired(true);  
+   
+//    // (multiple choice) checkboxes  
+//    item = "Microphone preference (if any)";  
+//    choices = ["wireless/lapel", "handheld", "podium/stand"];  
+//    form.addCheckboxItem()  
+//        .setTitle(item)  
+//        .setChoiceValues(choices);  
+//  }
+}
+
+// TODO: set gsheet destination
+
+function getValueFromGoogleSheet() {
   var ss= SpreadsheetApp.openById('15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I');
   var questionSheet = ss.getSheetByName('Sheet1');
   var returnData = questionSheet.getDataRange().getValues();
-  debugger
   return returnData;
 }
