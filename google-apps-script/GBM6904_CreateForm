@@ -9,9 +9,17 @@ function createForm() {
   // Loop across students
   for(j = 1; j < googleSheetsValues.length; j++)
   {
-      // create & name Form
-      var item = googleSheetsValues[j][0];
-      var form = FormApp.create(item).setTitle(item);
+    // create & name Form
+    var FirstName = googleSheetsValues[j][0];
+    var form = FormApp.create("GBM6904-2022_" + FirstName)
+                      .setTitle("Séminaires de génie biomédical (GBM 6904/7904)");
+
+    // Populate Form
+    item = "Séminaires de génie biomédical (GBM 6904/7904)";  
+    form.addTextItem()
+        .setTitle(item)
+        .setRequired(true);
+
     // (googleSheetsValues[j][header_index] != '') ? choiceArray.push(googleSheetsValues[j][header_index]) : null;
   }
 
