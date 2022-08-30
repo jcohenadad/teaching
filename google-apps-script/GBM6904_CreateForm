@@ -11,11 +11,13 @@ function createForm() {
   {
     // create & name Form
     var FirstName = googleSheetsValues[j][0];
+    var LastName = googleSheetsValues[j][1];
     var form = FormApp.create("GBM6904-2022_" + FirstName)
-                      .setTitle("Séminaires de génie biomédical (GBM 6904/7904)");
+                      .setTitle("Student: " + FirstName + " " + LastName)
+                      .setDescription("This form is used to grade the presentation. Please include constructive feedback at the end.");
 
     // Populate Form
-    item = "Séminaires de génie biomédical (GBM 6904/7904)";  
+    item = "Your student ID:";  
     form.addTextItem()
         .setTitle(item)
         .setRequired(true);
