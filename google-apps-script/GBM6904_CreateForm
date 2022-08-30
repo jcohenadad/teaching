@@ -1,0 +1,33 @@
+function createForm() {  
+   // create & name Form  
+   var item = "Speaker Information Form";  
+   var form = FormApp.create(item)  
+       .setTitle(item);  
+   
+   // single line text field  
+   item = "Name, Title, Organization";  
+   form.addTextItem()  
+       .setTitle(item)  
+       .setRequired(true);  
+   
+   // multi-line "text area"  
+   item = "Short biography (4-6 sentences)";  
+   form.addParagraphTextItem()  
+       .setTitle(item)  
+       .setRequired(true);  
+   
+   // radiobuttons  
+   item = "Handout format";  
+   var choices = ["1-Pager", "Stapled", "Soft copy (PDF)", "none"];  
+   form.addMultipleChoiceItem()  
+       .setTitle(item)  
+       .setChoiceValues(choices)  
+       .setRequired(true);  
+   
+   // (multiple choice) checkboxes  
+   item = "Microphone preference (if any)";  
+   choices = ["wireless/lapel", "handheld", "podium/stand"];  
+   form.addCheckboxItem()  
+       .setTitle(item)  
+       .setChoiceValues(choices);  
+ }
