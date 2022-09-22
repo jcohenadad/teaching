@@ -1,7 +1,27 @@
-
+// Create Google Forms for grading students during their oral presentation for the course GBM6904.
+// 
+// This script does the following:
+// - Fetches a Google Sheet that lists all students enrolled in the class (specific format for the sheet is required)
+// - Loops across students
+// - For each student, generate a Google Form and put it under OutputFolder
+// 
+// Before running:
+// - Update URL to Google Sheet
+// - Update output folder
+// 
+// Author: Julien Cohen-Adad
+// 
 // Useful info: 
+// - https://developers.google.com/apps-script/reference/forms
 // - https://cloud.google.com/blog/products/application-development/auto-generating-google-forms
 // - https://codewithcurt.com/populate-options-on-google-forms-from-google-sheets/
+
+// Parameters to setup
+const SpreadSheet = "15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I"
+const OutputFolder = "GBM6904-2022_GoogleForms"
+
+// Script starts here
+var folder=DriveApp.getFoldersByName(OutputFolder).next();
 
 function createForm() {
   // Fetch names of all students
@@ -10,75 +30,106 @@ function createForm() {
   for(j = 1; j < googleSheetsValues.length; j++)
   {
     // create & name Form
-    var FirstName = googleSheetsValues[j][0];
-    var LastName = googleSheetsValues[j][1];
-    var form = FormApp.create("GBM6904-2022_" + FirstName)
-                      .setTitle("Student: " + FirstName + " " + LastName)
-                      .setDescription("This form is used to grade the presentation. Please include constructive feedback at the end.");
+    var FirstName = googleSheetsValues[j][1];
+    var LastName = googleSheetsValues[j][2];
+    var form = FormApp.create("GBM6904-2022_" + FirstName + LastName)
+                      .setTitle("Étudiant : " + FirstName + " " + LastName)
+                      .setDescription("Ce formulaire est utilisé pour noter la présentation. Veuillez inclure des commentaires constructifs à la fin.");
 
     // Populate Form
-    item = "Your student ID:";  
+    item = "Votre matricule étudiant :";  
     form.addTextItem()
         .setTitle(item)
         .setRequired(true);
-
-    // (googleSheetsValues[j][header_index] != '') ? choiceArray.push(googleSheetsValues[j][header_index]) : null;
+        // TODO: check if number
+    form.addScaleItem()  
+        .setTitle("1. Le contexte était introduit")
+        .setHelpText("Context was introduced")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("2. Les buts de la recherche étaient clairement définis")
+        .setHelpText("Research goals were well defined")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("3. La méthodologie était clairement décrite")
+        .setHelpText("Research methods were clearly described")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("4. La discussion et interprétation des résultats étaient cohérents")
+        .setHelpText("Discussion/Interpretation of results was coherent")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("5. Les messages 'Take home' étaient synthétiques et représentatifs du projet")
+        .setHelpText("Take home messages were synthetics and representative of the project")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("6. Les diapositives étaient claires")
+        .setHelpText("Slides were clear")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("7. La présentation était ajustée à l'audience")
+        .setHelpText("The presentation was adjusted to the audience")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("8. L'étudiant.e parlait distinctement")
+        .setHelpText("The student spoke distinctly")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("9. L'étudiant.e a respecté les contraintes de temps")
+        .setHelpText("Presenter respected the time constraints")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()
+        .setTitle("10. Les questions étaient correctement répondues")
+        .setHelpText("Questions were correctly answered")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addParagraphTextItem()
+        .setTitle("S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)")
+        .setHelpText("Please provide constructive feedback to the student (anonymous)")
+        .setRequired(false);
+    
+    // Save form in output folder
+    saveItemInFolder(form,folder);
   }
-
-//   googleSheetsValues[0].forEach(function(header_value, header_index) {
-//     if(header_value == item.getTitle())
-//     {
-//       var choiceArray = [];
-//       for(j = 1; j < googleSheetsValues.length; j++)
-//       {
-//         (googleSheetsValues[j][header_index] != '') ? choiceArray.push(googleSheetsValues[j][header_index]) : null;
-//       }
-//       item.asMultipleChoiceItem().setChoiceValues(choiceArray);
-//       // If using Dropdown Questions use line below instead of line above.
-//       //item.asListItem().setChoiceValues(choiceArray);
-//     }
-//   });     
-
-
-//   var itemsArray = form.getItems();
-//   itemsArray.forEach(function(item){
-//   });
-
-
-//    // single line text field  
-//    item = "Name, Title, Organization";  
-//    form.addTextItem()  
-//        .setTitle(item)  
-//        .setRequired(true);  
-   
-//    // multi-line "text area"  
-//    item = "Short biography (4-6 sentences)";  
-//    form.addParagraphTextItem()  
-//        .setTitle(item)  
-//        .setRequired(true);  
-   
-//    // radiobuttons  
-//    item = "Handout format";  
-//    var choices = ["1-Pager", "Stapled", "Soft copy (PDF)", "none"];  
-//    form.addMultipleChoiceItem()  
-//        .setTitle(item)  
-//        .setChoiceValues(choices)  
-//        .setRequired(true);  
-   
-//    // (multiple choice) checkboxes  
-//    item = "Microphone preference (if any)";  
-//    choices = ["wireless/lapel", "handheld", "podium/stand"];  
-//    form.addCheckboxItem()  
-//        .setTitle(item)  
-//        .setChoiceValues(choices);  
-//  }
 }
 
-// TODO: set gsheet destination
 
 function getValueFromGoogleSheet() {
-  var ss= SpreadsheetApp.openById('15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I');
+  var ss= SpreadsheetApp.openById(SpreadSheet);
   var questionSheet = ss.getSheetByName('Sheet1');
   var returnData = questionSheet.getDataRange().getValues();
   return returnData;
+}
+
+/**
+ * Places file for given item into given folder.
+ * If the item is an object that does not support the getId() method or
+ * the folder is not a Folder object, an error will be thrown.
+ * From: http://stackoverflow.com/a/38042090/1677912
+ *
+ * @param {Object}  item     Any object that has an ID and is also a Drive File.
+ * @param {Folder}  folder   Google Drive Folder object.
+ */
+function saveItemInFolder(item,folder) {
+  var id = item.getId();  // Will throw error if getId() not supported.
+  folder.addFile(DriveApp.getFileById(id));
 }
