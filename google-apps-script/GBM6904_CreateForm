@@ -11,12 +11,16 @@
 // 
 // WARNING! If the list of students is high (typically >30 students), the script does not finish after 6 minutes and an error is sent: "Exceeded maximum execution time". If that happens, change the variable indexStart and re-run the script.
 // 
+// After running:
+// - Open each form, and click 'Responses' to create the associated SpreadSheet. Make sure the folder is 'shared for view'. The day after the student's presentation, remove all the matricules (for confidentiality) and only keep mine (000000), and then share with the student.
+// 
 // Author: Julien Cohen-Adad
 // 
 // Useful info: 
 // - https://developers.google.com/apps-script/reference/forms
 // - https://cloud.google.com/blog/products/application-development/auto-generating-google-forms
 // - https://codewithcurt.com/populate-options-on-google-forms-from-google-sheets/
+// - Use trigger: https://codeburst.io/automating-google-forms-sheets-using-apps-script-2c59db97966f
 
 // Parameters to setup
 const SpreadSheet = "15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I"
@@ -36,7 +40,7 @@ function createForm() {
     var FirstName = googleSheetsValues[j][1];
     var LastName = googleSheetsValues[j][2];
     var form = FormApp.create("GBM6904-2022_" + FirstName + LastName)
-                      .setTitle("Étudiant : " + FirstName + " " + LastName)
+                      .setTitle("Étudiant.e : " + FirstName + " " + LastName)
                       .setDescription("Ce formulaire est utilisé pour noter la présentation. Veuillez inclure des commentaires constructifs à la fin.");
 
     // Populate Form
@@ -142,3 +146,4 @@ function saveItemInFolder(item,folder) {
   var id = item.getId();  // Will throw error if getId() not supported.
   folder.addFile(DriveApp.getFileById(id));
 }
+
