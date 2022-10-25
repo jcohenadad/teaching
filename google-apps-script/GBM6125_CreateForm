@@ -1,0 +1,119 @@
+// Create Google Forms for grading students during their oral presentation for the course GBM6125.
+// 
+// This script does the following:
+// - Fetches a Google Sheet that lists all groups (specific format for the sheet is required)
+// - Loops across students
+// - For each group, generate a Google Form and put it under OutputFolder
+// 
+// Before running:
+// - Update URL to Google Sheet
+// - Update output folder
+// 
+// WARNING! If the list of students is high (typically >30 students), the script does not finish after 6 minutes and an error is sent: "Exceeded maximum execution time". If that happens, change the variable indexStart and re-run the script.
+// 
+// After running:
+// - Open each form, and click 'Responses' to create the associated SpreadSheet. Make sure the folder is 'shared for view'. The day after the student's presentation, remove all the matricules (for confidentiality) and only keep mine (000000), and then share with the student.
+// 
+// Author: Julien Cohen-Adad
+// 
+// Useful info: 
+// - https://developers.google.com/apps-script/reference/forms
+// - https://cloud.google.com/blog/products/application-development/auto-generating-google-forms
+// - https://codewithcurt.com/populate-options-on-google-forms-from-google-sheets/
+// - Use trigger: https://codeburst.io/automating-google-forms-sheets-using-apps-script-2c59db97966f
+
+// Parameters to setup
+const SpreadSheet = "1X6ZjZy0dUceHaT5cZys5AQtCVl9WXUASo4o47QeLQis"
+const OutputFolder = "GBM6125-2022_GoogleForms"
+const indexStart = 1  // If "Exceeded maximum execution time" is encountered, change this to the index to start from and re-run the script.
+
+// Script starts here
+var folder=DriveApp.getFoldersByName(OutputFolder).next();
+
+function createForm() {
+  // Fetch names of all students
+  var googleSheetsValues = getValueFromGoogleSheet();
+  // Loop across students
+  for(j = indexStart; j < googleSheetsValues.length; j++)
+  {
+    // create & name Form
+    var Group = googleSheetsValues[j][0];
+    var FirstName1 = googleSheetsValues[j][1];
+    var LastName1 = googleSheetsValues[j][2];
+    var FirstName2 = googleSheetsValues[j][3];
+    var LastName2 = googleSheetsValues[j][4];
+    var form = FormApp.create("GBM6125-2022_" + FirstName1 + LastName2)
+                      .setTitle("Étudiants : " + FirstName1 + " " + LastName1 + " & " + FirstName2 + " " + LastName2)
+                      .setDescription("Ce formulaire est utilisé pour noter la présentation.");
+
+    // Populate Form
+    item = "Votre matricule étudiant :";  
+    form.addTextItem()
+        .setTitle(item)
+        .setRequired(true);
+        // TODO: check if number
+    form.addScaleItem()  
+        .setTitle("1. Habilité à présenter")
+        .setHelpText("Presentation skill")  // TODO: put this in italic
+        .setBounds(1, 4)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("2. Revue de litérature")
+        .setHelpText("Litterature review")  // TODO: put this in italic
+        .setBounds(1, 3)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("3. Structure de la présentation")
+        .setHelpText("Structure of the presentation")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("4. Analyse critique")
+        .setHelpText("Critical thinking")  // TODO: put this in italic
+        .setBounds(1, 5)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    form.addScaleItem()  
+        .setTitle("5. Respect du temps imparti")
+        .setHelpText("Timing")  // TODO: put this in italic
+        .setBounds(1, 3)
+        .setLabels("Mauvais", "Excellent")
+        .setRequired(true);  
+    
+    // Save form in output folder
+    saveItemInFolder(form,folder);
+
+    // Add to Google Sheet entry
+    var formUrlLong = form.getPublishedUrl();
+    var formUrlShort = form.shortenFormUrl(formUrlLong);    
+    var ss = SpreadsheetApp.openById(SpreadSheet);
+    ss.getSheetByName('Sheet1').getRange(j+1,7).setValue(formUrlShort);
+  }
+}
+
+
+function getValueFromGoogleSheet() {
+  var ss = SpreadsheetApp.openById(SpreadSheet);
+  var questionSheet = ss.getSheetByName('Sheet1');
+  var returnData = questionSheet.getDataRange().getValues();
+  return returnData;
+}
+
+/**
+ * Places file for given item into given folder.
+ * If the item is an object that does not support the getId() method or
+ * the folder is not a Folder object, an error will be thrown.
+ * From: http://stackoverflow.com/a/38042090/1677912
+ *
+ * @param {Object}  item     Any object that has an ID and is also a Drive File.
+ * @param {Folder}  folder   Google Drive Folder object.
+ */
+function saveItemInFolder(item,folder) {
+  var id = item.getId();  // Will throw error if getId() not supported.
+  folder.addFile(DriveApp.getFileById(id));
+}
+
+
