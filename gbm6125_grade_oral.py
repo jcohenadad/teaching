@@ -15,6 +15,7 @@ folder_gform = "1DjaqpTOp1QAy042qlFBoCpTY3wDA8lZp"  # Folder that contains all G
 
 # import requests
 import logging
+import numpy as np
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from apiclient import discovery
@@ -23,13 +24,13 @@ from oauth2client import client, file, tools
 
 
 # Pydrive auth
+# TODO: no need to use pydrive (can do the same thing with google API)
 gauth = GoogleAuth()
 gauth.LocalWebserverAuth()  # Creates local webserver and auto handles authentication.
 
 # Google API auth
 SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
           "https://www.googleapis.com/auth/forms.responses.readonly"]
-# SCOPES = "https://www.googleapis.com/auth/forms"
 DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
 store = file.Storage('token.json')
 creds = None
@@ -46,21 +47,26 @@ file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetLis
 for file1 in file_list:
     form_id = file1['id']
     logging.debug('title: %s, id: %s' % (file1['title'], form_id))
+    # Get form metadata to get students' name
     result_metadata = service.forms().get(formId=form_id).execute()
     students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
+    # Get form responses
     result = service.forms().responses().list(formId=form_id).execute()
+    value = []
+    gradeStudent = []
+    for i, j in result['responses'][1].get('answers').items():
+        value.append(j['textAnswers']['answers'][0]['value'])
+    matricule = value[0]
+    grade = np.sum([int(i) for i in value[1:]])
+    logging.debug('Matricule: {} | Grade: {}'.format(matricule, grade))
+    if (matricule == '000000'):
+        # Prof response
+        gradeProf = grade
+    else:
+        # Student response
+        gradeStudent.append(grade)
+    # Compute average grade
+    gradeAvg = (gradeProf + np.mean(gradeStudent)) / 2
+    logging.info('grade: {}'.format(gradeAvg))
 
-#       grade = computeGrade(itemResponses);
-#       Logger.log('Matricule: %s | Grade: %s', matricule, grade.toString());
-#       if (matricule == "000000") {
-#         // Prof response
-#         var gradeProf = grade;
-#       } else {
-#         // Student response
-#         gradeStudents.push(grade);
-#       }
-#     }
-#     // Compute average grade
-#     var gradeAverage = computeAverageGrade(gradeProf, gradeStudents);
-#     // Logger.log('gradeStudents: %s', gradeStudents)
-#     // TODO: put value in gsheet
+# TODO: put value in gsheet
