@@ -34,6 +34,7 @@ from pydrive.drive import GoogleDrive
 # TODO: make it an input param
 # folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
 gform_url = "https://docs.google.com/forms/d/1i6plhhhnYtP-qHnstB1yBLusKdDdy05rXmJX0Lj8jro/viewform"  # URL of the Form
+title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
 logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
@@ -64,11 +65,21 @@ gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuff
 # Get form metadata to get students' name
 result_metadata = service.forms().get(formId=gform_id).execute()
 student = result_metadata['info']['title']
+# Get questionID of the feedback
+questionId = ''
+for item in result_metadata['items']:
+    if item['title'] == title_feedback:
+        questionId = item['questionItem']['question']['questionId']
+if questionId == '':
+    logger.error('questionId could not be retrieved. Check question title.')
+    raise RuntimeError
+
 # Get form responses
 result = service.forms().responses().list(formId=gform_id).execute()
+# Loop across all responses and append student's feedback
 feedback = []
-for i, j in result['responses'][1].get('answers').items():
-    # TODO: get text
-    feedback.append(j['textAnswers']['answers'][0]['value'])
+for responses in result['responses']:
+    logger.debug(responses)
+    feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
 
 # TODO: email text to student
