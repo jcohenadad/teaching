@@ -20,6 +20,7 @@
 
 
 import coloredlogs
+import csv
 import logging
 import numpy as np
 
@@ -37,12 +38,34 @@ from googleapiclient.errors import HttpError
 
 # Parameters
 # TODO: make it an input param
-# folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
 gform_url = "https://docs.google.com/forms/d/1i6plhhhnYtP-qHnstB1yBLusKdDdy05rXmJX0Lj8jro/viewform"  # URL of the Form
+matricule = "1956137"  # Student matricule
 title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
 # TODO: have this address in local config files
 email_from = "jcohen@polymtl.ca"
+path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/GBM6904-7904-20223-01C.csv"
 logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
+
+
+def fetch_email_address(matricule: str, path_csv: str) -> str:
+    """
+    Find email address of student based on their matricule, using a CSV file that is provided by the university.
+    This function assumes the following CSV structure:
+        matricule | Last name | First name | email
+
+    :param matricule:
+    :param path_csv: CSV file that contains matricule and email address of students. Provided by the university.
+    :return: email_addr: Email address of student
+    """
+    # encoding='latin-1' is required because of non utf-8 characters in the CSV file (accents, etc.)
+    with open(path_csv, newline='', encoding='latin-1') as csvfile:
+        reader = csv.reader(csvfile, delimiter=';')
+        for row in reader:
+            if row[0] == matricule:
+                return row[3]
+        # If email was not found, raise error
+        logger.error('Did not found email from the CSV file with matricule: {}'.format(matricule))
+        raise RuntimeError
 
 
 def gmail_send_message(email_to: str, subject: str, email_body: str):
@@ -138,7 +161,7 @@ for responses in result['responses']:
         feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
 
 # TODO: email text to student
-email_to = ''
+email_to = fetch_email_address(matricule, path_csv)
 email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
 email_body = \
     "Bonjour,\n\n" \
