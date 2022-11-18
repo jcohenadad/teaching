@@ -14,6 +14,7 @@
 # TODO: change script to function
 
 
+import coloredlogs
 import logging
 import numpy as np
 # import google.auth
@@ -31,7 +32,12 @@ from pydrive.drive import GoogleDrive
 # TODO: make it an input param
 folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
 gform_id = "https://docs.google.com/forms/d/e/1FAIpQLSfBNS4_2lz4Vj199lc9wtR51XYsjq0PDCqSShYcUHQk7G46aA/viewform"  # ID of the Google Form. Find it by clicking on the URL that brings to the form.
+logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
 
+# Initialize colored logging
+# Note: coloredlogs.install() replaces logging.BasicConfig()
+logger = logging.getLogger(__name__)
+coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 
 # Pydrive auth
 # TODO: no need to use pydrive (can do the same thing with google API)
@@ -55,7 +61,7 @@ drive = GoogleDrive(gauth)
 file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetList()
 for file1 in file_list:
     form_id = file1['id']
-    logging.debug('title: %s, id: %s' % (file1['title'], form_id))
+    logger.debug('title: %s, id: %s' % (file1['title'], form_id))
 
 
 service = discovery.build('drive', 'v1', http=creds.authorize(
