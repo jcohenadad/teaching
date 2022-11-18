@@ -144,5 +144,5 @@ email_body = \
     "Bonjour,\n\n" \
     "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
     "ci-dessous correspond au feedback d'un étudiant.\n\n"
-email_body += "\n- ".join(feedback)
+email_body += "- " + "\n- ".join(feedback)
 gmail_send_message(email_to, email_subject, email_body)
