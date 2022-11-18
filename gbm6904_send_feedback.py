@@ -2,6 +2,11 @@
 #
 # For course GBM6904. Fetch Google Form (providing ID of the form), gather and email feedback to the student.
 #
+# How to use:
+# - Open the gsheet with the list of presentations
+# - Copy the URL of the student to send the feedback to
+# - Input in this function
+#
 # The file "client_secrets.json" need to be present in the working directory.
 #
 # Useful documentation
@@ -17,9 +22,6 @@
 import coloredlogs
 import logging
 import numpy as np
-# import google.auth
-# from googleapiclient.discovery import build
-# from googleapiclient.errors import HttpError
 
 from apiclient import discovery
 from httplib2 import Http
@@ -30,8 +32,8 @@ from pydrive.drive import GoogleDrive
 
 # Parameters
 # TODO: make it an input param
-folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
-gform_id = "https://docs.google.com/forms/d/e/1FAIpQLSfBNS4_2lz4Vj199lc9wtR51XYsjq0PDCqSShYcUHQk7G46aA/viewform"  # ID of the Google Form. Find it by clicking on the URL that brings to the form.
+# folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
+gform_url = "https://docs.google.com/forms/d/1i6plhhhnYtP-qHnstB1yBLusKdDdy05rXmJX0Lj8jro/viewform"  # URL of the Form
 logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
@@ -41,8 +43,8 @@ coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 
 # Pydrive auth
 # TODO: no need to use pydrive (can do the same thing with google API)
-gauth = GoogleAuth()
-gauth.LocalWebserverAuth()  # Creates local webserver and auto handles authentication.
+# gauth = GoogleAuth()
+# gauth.LocalWebserverAuth()  # Creates local webserver and auto handles authentication.
 
 # Google API auth
 SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
@@ -56,68 +58,17 @@ if not creds or creds.invalid:
 service = discovery.build('forms', 'v1', http=creds.authorize(
     Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
 
-# Iterate through all files in folder
-drive = GoogleDrive(gauth)
-file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetList()
-for file1 in file_list:
-    form_id = file1['id']
-    logger.debug('title: %s, id: %s' % (file1['title'], form_id))
-
-
-service = discovery.build('drive', 'v1', http=creds.authorize(
-    Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-
-response = service.files().list(q="'{}' in parents".format('GBM6904-2022_GoogleForms'),
-                                spaces='drive',
-                                fields='nextPageToken, '
-                                       'files(id, name)').execute()
-
-for file in response.get('files', []):
-    # Process change
-    print(F'Found file: {file.get("name")}, {file.get("id")}')
-files.extend(response.get('files', []))
-page_token = response.get('nextPageToken', None)
-# if page_token is None:
-#
-# service = discovery.build('forms', 'v1', http=creds.authorize(
-#     Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-
-
-# creds, _ = google.auth.default()
-
-try:
-    # create drive api client
-    # service = build('drive', 'v3', credentials=creds)
-    # files = []
-    # page_token = None
-    while True:
-        # pylint: disable=maybe-no-member
-        response = service.files().list(q="mimeType='form'",
-                                        spaces='drive',
-                                        fields='nextPageToken, '
-                                               'files(id, name)',
-                                        pageToken=page_token).execute()
-        for file in response.get('files', []):
-            # Process change
-            print(F'Found file: {file.get("name")}, {file.get("id")}')
-        files.extend(response.get('files', []))
-        page_token = response.get('nextPageToken', None)
-        if page_token is None:
-            break
-except HttpError as error:
-    print(F'An error occurred: {error}')
-    files = None
-
+# Get ID from URL
+gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
 
 # Get form metadata to get students' name
 result_metadata = service.forms().get(formId=gform_id).execute()
-students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
+student = result_metadata['info']['title']
 # Get form responses
 result = service.forms().responses().list(formId=gform_id).execute()
-value = []
-gradeStudent = []
+feedback = []
 for i, j in result['responses'][1].get('answers').items():
     # TODO: get text
-    value.append(j['textAnswers']['answers'][0]['value'])
+    feedback.append(j['textAnswers']['answers'][0]['value'])
 
 # TODO: email text to student
