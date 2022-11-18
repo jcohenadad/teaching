@@ -16,14 +16,27 @@
 
 import logging
 import numpy as np
+# import google.auth
+# from googleapiclient.discovery import build
+# from googleapiclient.errors import HttpError
+
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 
 # Parameters
 # TODO: make it an input param
-gform_url = "https://forms.gle/FM9HdFzgNGybsEMi8"  # URL of the Google Form
+folder_gform = '10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3'  # Folder ID that contains all Google Forms
+gform_id = "https://docs.google.com/forms/d/e/1FAIpQLSfBNS4_2lz4Vj199lc9wtR51XYsjq0PDCqSShYcUHQk7G46aA/viewform"  # ID of the Google Form. Find it by clicking on the URL that brings to the form.
+
+
+# Pydrive auth
+# TODO: no need to use pydrive (can do the same thing with google API)
+gauth = GoogleAuth()
+gauth.LocalWebserverAuth()  # Creates local webserver and auto handles authentication.
 
 # Google API auth
 SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
@@ -37,13 +50,64 @@ if not creds or creds.invalid:
 service = discovery.build('forms', 'v1', http=creds.authorize(
     Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
 
+# Iterate through all files in folder
+drive = GoogleDrive(gauth)
+file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetList()
+for file1 in file_list:
+    form_id = file1['id']
+    logging.debug('title: %s, id: %s' % (file1['title'], form_id))
+
+
+service = discovery.build('drive', 'v1', http=creds.authorize(
+    Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+
+response = service.files().list(q="'{}' in parents".format('GBM6904-2022_GoogleForms'),
+                                spaces='drive',
+                                fields='nextPageToken, '
+                                       'files(id, name)').execute()
+
+for file in response.get('files', []):
+    # Process change
+    print(F'Found file: {file.get("name")}, {file.get("id")}')
+files.extend(response.get('files', []))
+page_token = response.get('nextPageToken', None)
+# if page_token is None:
+#
+# service = discovery.build('forms', 'v1', http=creds.authorize(
+#     Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+
+
+# creds, _ = google.auth.default()
+
+try:
+    # create drive api client
+    # service = build('drive', 'v3', credentials=creds)
+    # files = []
+    # page_token = None
+    while True:
+        # pylint: disable=maybe-no-member
+        response = service.files().list(q="mimeType='form'",
+                                        spaces='drive',
+                                        fields='nextPageToken, '
+                                               'files(id, name)',
+                                        pageToken=page_token).execute()
+        for file in response.get('files', []):
+            # Process change
+            print(F'Found file: {file.get("name")}, {file.get("id")}')
+        files.extend(response.get('files', []))
+        page_token = response.get('nextPageToken', None)
+        if page_token is None:
+            break
+except HttpError as error:
+    print(F'An error occurred: {error}')
+    files = None
+
+
 # Get form metadata to get students' name
-# TODO: that is not the ID-- find a way to get IF from URL
-form_id = gform_url.strip('https://forms.gle/')
-result_metadata = service.forms().get(form_id).execute()
+result_metadata = service.forms().get(formId=gform_id).execute()
 students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
 # Get form responses
-result = service.forms().responses().list(formId=form_id).execute()
+result = service.forms().responses().list(formId=gform_id).execute()
 value = []
 gradeStudent = []
 for i, j in result['responses'][1].get('answers').items():
