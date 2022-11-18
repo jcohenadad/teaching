@@ -15,36 +15,109 @@
 # - https://pythonhosted.org/PyDrive/quickstart.html#authentication
 #
 # Author: Julien Cohen-Adad
-#
-# TODO: change script to function
 
-
+import argparse
 import coloredlogs
 import csv
 import logging
-import numpy as np
-
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 import base64
 from email.message import EmailMessage
-import google.auth
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
 # Parameters
-# TODO: make it an input param
-gform_url = "https://docs.google.com/forms/d/1i6plhhhnYtP-qHnstB1yBLusKdDdy05rXmJX0Lj8jro/viewform"  # URL of the Form
-matricule = "1956137"  # Student matricule
 title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
-# TODO: have this address in local config files
+# TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
 path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/GBM6904-7904-20223-01C.csv"
 logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
+
+# Initialize colored logging
+# Note: coloredlogs.install() replaces logging.BasicConfig()
+logger = logging.getLogger(__name__)
+coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
+
+
+def get_parameters():
+    parser = argparse.ArgumentParser(description="""
+    Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
+    parser.add_argument("-u", "--url",
+                        help="URL of the Google Form",
+                        required=True)
+    parser.add_argument("-m", "--matricule",
+                        help="Student matricule. Used to fetch the email address.",
+                        required=True)
+    # ID and SECRET arguments as new command line parameters
+    # Here is where you extend the oauth2client.tools startnd arguments
+    # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
+    # tools.argparser.add_argument('-ci', '--client-id', type=str, required=True,
+    #                              help='The client ID of your GCP project')
+    # tools.argparser.add_argument('-cs', '--client-secret', type=str, required=True,
+    #                              help='The client Secret of your GCP project')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    """
+    :param args:
+    :return:
+    """
+
+    # Get input parameters
+    args = get_parameters()
+    gform_url = args.url
+    matricule = args.matricule
+
+    # Google API auth
+    SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
+              "https://www.googleapis.com/auth/forms.responses.readonly"]
+    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+    store = file.Storage('token.json')
+    creds = None
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
+        creds = tools.run_flow(flow, store)
+    service = discovery.build('forms', 'v1', http=creds.authorize(
+        Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+
+    # Get ID from URL
+    gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
+
+    # Get form metadata to get students' name
+    result_metadata = service.forms().get(formId=gform_id).execute()
+    student = result_metadata['info']['title']
+    # Get questionID of the feedback
+    questionId = ''
+    for item in result_metadata['items']:
+        if item['title'] == title_feedback:
+            questionId = item['questionItem']['question']['questionId']
+    if questionId == '':
+        logger.error('questionId could not be retrieved. Check question title.')
+        raise RuntimeError
+
+    # Get form responses
+    result = service.forms().responses().list(formId=gform_id).execute()
+    # Loop across all responses and append student's feedback
+    feedback = []
+    for responses in result['responses']:
+        logger.debug(responses)
+        if questionId in responses['answers'].keys():
+            feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
+
+    # TODO: email text to student
+    email_to = fetch_email_address(matricule, path_csv)
+    email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
+    email_body = \
+        "Bonjour,\n\n" \
+        "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
+        "ci-dessous correspond au feedback d'un étudiant.\n\n"
+    email_body += "- " + "\n- ".join(feedback)
+    gmail_send_message(email_to, email_subject, email_body)
 
 
 def fetch_email_address(matricule: str, path_csv: str) -> str:
@@ -114,58 +187,5 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
     return send_message
 
 
-# Initialize colored logging
-# Note: coloredlogs.install() replaces logging.BasicConfig()
-logger = logging.getLogger(__name__)
-coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
-
-# Pydrive auth
-# TODO: no need to use pydrive (can do the same thing with google API)
-# gauth = GoogleAuth()
-# gauth.LocalWebserverAuth()  # Creates local webserver and auto handles authentication.
-
-# Google API auth
-SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
-          "https://www.googleapis.com/auth/forms.responses.readonly"]
-DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-store = file.Storage('token.json')
-creds = None
-if not creds or creds.invalid:
-    flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-    creds = tools.run_flow(flow, store)
-service = discovery.build('forms', 'v1', http=creds.authorize(
-    Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
-
-# Get ID from URL
-gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
-
-# Get form metadata to get students' name
-result_metadata = service.forms().get(formId=gform_id).execute()
-student = result_metadata['info']['title']
-# Get questionID of the feedback
-questionId = ''
-for item in result_metadata['items']:
-    if item['title'] == title_feedback:
-        questionId = item['questionItem']['question']['questionId']
-if questionId == '':
-    logger.error('questionId could not be retrieved. Check question title.')
-    raise RuntimeError
-
-# Get form responses
-result = service.forms().responses().list(formId=gform_id).execute()
-# Loop across all responses and append student's feedback
-feedback = []
-for responses in result['responses']:
-    logger.debug(responses)
-    if questionId in responses['answers'].keys():
-        feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
-
-# TODO: email text to student
-email_to = fetch_email_address(matricule, path_csv)
-email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
-email_body = \
-    "Bonjour,\n\n" \
-    "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
-    "ci-dessous correspond au feedback d'un étudiant.\n\n"
-email_body += "- " + "\n- ".join(feedback)
-gmail_send_message(email_to, email_subject, email_body)
+if __name__ == "__main__":
+    main()
