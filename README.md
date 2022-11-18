@@ -8,7 +8,7 @@ https://pythonhosted.org/PyDrive/quickstart.html#authentication
 # Prerequisite (Google API)
 
 - Enable [Google Forms API](https://console.developers.google.com/apis/api/forms.googleapis.com/overview?project=1036953068115)
-
+- Enable [Gmail API](https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=1036953068115)
 
 # Virtual environment
 
