@@ -80,6 +80,7 @@ result = service.forms().responses().list(formId=gform_id).execute()
 feedback = []
 for responses in result['responses']:
     logger.debug(responses)
-    feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
+    if questionId in responses['answers'].keys():
+        feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
 
 # TODO: email text to student
