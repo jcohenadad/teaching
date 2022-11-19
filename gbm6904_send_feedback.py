@@ -80,7 +80,8 @@ def main():
             description=__doc__,
             formatter_class=argparse.RawDescriptionHelpFormatter,
             parents=[tools.argparser])
-        flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
+        # flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
+        flags = parser.parse_args([])
         creds = tools.run_flow(flow, store, flags=flags)
     service = discovery.build('forms', 'v1', http=creds.authorize(
         Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
@@ -159,7 +160,14 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
     creds = None
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-        creds = tools.run_flow(flow, store)
+        # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
+        # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
+        parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            parents=[tools.argparser])
+        flags = parser.parse_args([])
+        creds = tools.run_flow(flow, store, flags=flags)
 
     try:
         service = build('gmail', 'v1', credentials=creds)
