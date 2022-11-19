@@ -51,13 +51,6 @@ def get_parameters():
     parser.add_argument("-m", "--matricule",
                         help="Student matricule. Used to fetch the email address.",
                         required=True)
-    # ID and SECRET arguments as new command line parameters
-    # Here is where you extend the oauth2client.tools startnd arguments
-    # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
-    # tools.argparser.add_argument('-ci', '--client-id', type=str, required=True,
-    #                              help='The client ID of your GCP project')
-    # tools.argparser.add_argument('-cs', '--client-secret', type=str, required=True,
-    #                              help='The client Secret of your GCP project')
     args = parser.parse_args()
     return args
 
@@ -81,7 +74,14 @@ def main():
     creds = None
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-        creds = tools.run_flow(flow, store)
+        # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
+        # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
+        parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            parents=[tools.argparser])
+        flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
+        creds = tools.run_flow(flow, store, flags=flags)
     service = discovery.build('forms', 'v1', http=creds.authorize(
         Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
 
