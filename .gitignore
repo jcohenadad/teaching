@@ -1,5 +1,6 @@
 .idea
 teaching.egg-info/
+__pycache__
 
 # MacOS stuff
 .DS_Store
