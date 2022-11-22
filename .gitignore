@@ -1,4 +1,5 @@
 .idea
+teaching.egg-info/
 
 # Google Auth stuff
 client_secrets.json
