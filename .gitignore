@@ -1,6 +1,9 @@
 .idea
 teaching.egg-info/
 
+# MacOS stuff
+.DS_Store
+
 # Google Auth stuff
 client_secrets.json
 token.json
