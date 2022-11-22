@@ -45,12 +45,10 @@ coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 def get_parameters():
     parser = argparse.ArgumentParser(description="""
     Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
-    parser.add_argument("-u", "--url",
-                        help="URL of the Google Form",
-                        required=True)
-    parser.add_argument("-m", "--matricule",
-                        help="Student matricule. Used to fetch the email address.",
-                        required=True)
+    parser.add_argument('matricule',
+                        help="Student matricule. Used to fetch the email address.")
+    parser.add_argument('url',
+                        help="URL of the Google Form")
     args = parser.parse_args()
     return args
 
