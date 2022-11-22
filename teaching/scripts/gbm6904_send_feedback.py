@@ -34,7 +34,7 @@ title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
 path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/GBM6904-7904-20223-01C.csv"
-logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
+logging_level = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
