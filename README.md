@@ -22,6 +22,11 @@ source activate teaching
 pip install -e .
 ~~~
 
+Tips: add alias in your bashrc/zshrc (for Tab completion):
+~~~
+alias send_feedback="send_feedback"
+~~~
+
 # Usage
 
 ## GBM6904/7904
