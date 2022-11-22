@@ -12,7 +12,22 @@ https://pythonhosted.org/PyDrive/quickstart.html#authentication
 
 # Virtual environment
 
-
 ~~~
 source activate teaching
 ~~~
+
+# Install
+
+~~~
+pip install -e .
+~~~
+
+# Usage
+
+## GBM6904/7904
+
+- **Send feedback to student:** Go to Google Sheet that lists all presenters, fetch the required data and run:  
+  ~~~
+  send_feedback <MATRICULE> <URL>
+  ~~~
+  
