@@ -20,11 +20,11 @@ import argparse
 import coloredlogs
 import csv
 import logging
-from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 import base64
 from email.message import EmailMessage
+from googleapiclient import discovery
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 

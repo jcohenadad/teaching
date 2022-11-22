@@ -1,5 +1,8 @@
-# pydrive
-coloredlogs
-requests
 apiclient
+coloredlogs
+httplib2
+google-api-python-client
 google
+oauth2client
+requests
+setuptools
