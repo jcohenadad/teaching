@@ -63,13 +63,23 @@ for file1 in file_list:
     students = result_metadata['info']['title'].strip('Étudiants : ')
     # Get form responses
     result = service.forms().responses().list(formId=form_id).execute()
+    len_result = len(result['responses'])
     gradeStudent = []
-    for i_response in range(len(result['responses'])):
+    for i_response in range(len_result):
         value = []
+        matricule = ''
         for i, j in result['responses'][i_response]['answers'].items():
-            value.append(j['textAnswers']['answers'][0]['value'])
-        matricule = value[0]
-        grade = np.sum([int(i) for i in value[1:]])
+            result_item = j['textAnswers']['answers'][0]['value']
+            # Hack: because results are not sorted (ie: matricule is not the first item), we need to look for the
+            # matricule based on the string length.
+            if len(result_item) > 3:
+                matricule = result_item
+            else:
+                value.append(result_item)
+        # Make sure a matricule was found
+        if matricule == '':
+            raise RuntimeError('Problem identifying matricule.')
+        grade = np.sum([int(i) for i in value])
         logger.debug('Matricule: {} | Grade: {}'.format(matricule, grade))
         if (matricule == '000000'):
             # Prof response
