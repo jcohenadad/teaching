@@ -10,10 +10,8 @@
 #
 # Author: Julien Cohen-Adad
 
-# Parameters
-folder_gform = "1DjaqpTOp1QAy042qlFBoCpTY3wDA8lZp"  # Folder that contains all Google Forms
-
 # import requests
+import coloredlogs
 import logging
 import numpy as np
 from pydrive.auth import GoogleAuth
@@ -21,6 +19,16 @@ from pydrive.drive import GoogleDrive
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
+
+
+# Parameters
+folder_gform = "1DjaqpTOp1QAy042qlFBoCpTY3wDA8lZp"  # Folder that contains all Google Forms
+logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
+
+# Initialize colored logging
+# Note: coloredlogs.install() replaces logging.BasicConfig()
+logger = logging.getLogger(__name__)
+coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 
 
 # Pydrive auth
@@ -46,7 +54,7 @@ drive = GoogleDrive(gauth)
 file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetList()
 for file1 in file_list:
     form_id = file1['id']
-    logging.debug('title: %s, id: %s' % (file1['title'], form_id))
+    logger.debug('title: %s, id: %s' % (file1['title'], form_id))
     # Get form metadata to get students' name
     result_metadata = service.forms().get(formId=form_id).execute()
     students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
