@@ -54,7 +54,7 @@ drive = GoogleDrive(gauth)
 file_list = drive.ListFile({'q': "'{}' in parents".format(folder_gform)}).GetList()
 for file1 in file_list:
     form_id = file1['id']
-    logger.debug('title: %s, id: %s' % (file1['title'], form_id))
+    logger.debug('title: {}, id: {}'.format(file1['title'], form_id))
     # Get form metadata to get students' name
     result_metadata = service.forms().get(formId=form_id).execute()
     students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
