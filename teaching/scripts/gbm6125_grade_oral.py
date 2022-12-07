@@ -60,21 +60,22 @@ for file1 in file_list:
     students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
     # Get form responses
     result = service.forms().responses().list(formId=form_id).execute()
-    value = []
     gradeStudent = []
-    for i, j in result['responses'][1].get('answers').items():
-        value.append(j['textAnswers']['answers'][0]['value'])
-    matricule = value[0]
-    grade = np.sum([int(i) for i in value[1:]])
-    logging.debug('Matricule: {} | Grade: {}'.format(matricule, grade))
-    if (matricule == '000000'):
-        # Prof response
-        gradeProf = grade
-    else:
-        # Student response
-        gradeStudent.append(grade)
+    for i_response in range(len(result['responses'])):
+        value = []
+        for i, j in result['responses'][i_response]['answers'].items():
+            value.append(j['textAnswers']['answers'][0]['value'])
+        matricule = value[0]
+        grade = np.sum([int(i) for i in value[1:]])
+        logger.debug('Matricule: {} | Grade: {}'.format(matricule, grade))
+        if (matricule == '000000'):
+            # Prof response
+            gradeProf = grade
+        else:
+            # Student response
+            gradeStudent.append(grade)
     # Compute average grade
     gradeAvg = (gradeProf + np.mean(gradeStudent)) / 2
-    logging.info('grade: {}'.format(gradeAvg))
+    logger.info('grade: {}'.format(gradeAvg))
 
 # TODO: put value in gsheet
