@@ -4,5 +4,6 @@ httplib2
 google-api-python-client
 google
 oauth2client
+pandas
 requests
 setuptools

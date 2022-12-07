@@ -14,6 +14,7 @@
 import coloredlogs
 import logging
 import numpy as np
+import pandas as pd
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from apiclient import discovery
@@ -48,6 +49,8 @@ if not creds or creds.invalid:
 service = discovery.build('forms', 'v1', http=creds.authorize(
     Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
 
+# Initialize dataframe to be exported as CSV
+df = pd.DataFrame()
 
 # Auto-iterate through all files that matches this query
 drive = GoogleDrive(gauth)
@@ -57,7 +60,7 @@ for file1 in file_list:
     logger.debug('title: {}, id: {}'.format(file1['title'], form_id))
     # Get form metadata to get students' name
     result_metadata = service.forms().get(formId=form_id).execute()
-    students = result_metadata['info']['title'].strip('Étudiants : ').split(' & ')
+    students = result_metadata['info']['title'].strip('Étudiants : ')
     # Get form responses
     result = service.forms().responses().list(formId=form_id).execute()
     gradeStudent = []
@@ -77,5 +80,7 @@ for file1 in file_list:
     # Compute average grade
     gradeAvg = (gradeProf + np.mean(gradeStudent)) / 2
     logger.info('grade: {}'.format(gradeAvg))
+    # Append to dataframe
+    df = pd.concat([df, pd.DataFrame({"Students": students, "Grade": gradeAvg}, index=[1])])
 
-# TODO: put value in gsheet
+df.to_csv('GBM6125_grades_oral.csv')
