@@ -25,7 +25,7 @@ logger.remove()
 logger.add(sys.stderr, level="DEBUG")
 
 # Opening source Excel file
-wb1 = xl.load_workbook(fname_source, read_only=True)
+wb1 = xl.load_workbook(fname_source, read_only=True, data_only=True)
 ws1 = wb1.active
 
 # opening the destination Excel file
