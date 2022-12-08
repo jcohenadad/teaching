@@ -40,21 +40,24 @@ for n_row_src, row in enumerate(ws1, 1):
         break
 
 
-def invalid_cell(value):
+def isvalid_cell(value):
     """
     Check if the cell value fits desired properties
     :param value:
-    :return: False if the cell is OK, True otherwise.
+    :return: True if the cell is OK, False otherwise.
     """
     if value is None:
-        return True
+        return False
+    # # First, check if it is an integer
+    # if type(value) is int:
+    #     return
     # Matricule should be a number
     if not value.isdigit():
-        return True
+        return False
     # Matricule should have 7 digits
     if not len(value) == 7:
-        return True
-    return False
+        return False
+    return True
 
 
 # copying the cell values from source
@@ -63,7 +66,7 @@ for i in range(row_start_src + 1, n_row_src + 1):
     # Read index value from source file
     id = ws1.cell(row=i, column=col_id_src).value
     # run some checks to make sure this index corresponds to the desired field
-    if invalid_cell(id):
+    if not isvalid_cell(id):
         continue
     # Read value from source file
     val = ws1.cell(row=i, column=col_val_src).value
