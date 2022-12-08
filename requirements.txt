@@ -4,6 +4,7 @@ httplib2
 google-api-python-client
 google
 oauth2client
+openpyxl
 pandas
 requests
 setuptools

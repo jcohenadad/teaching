@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-This script finds the value of a source EXCEL file and insert it in a destination EXCEL file. The matching is done on
- a column specified in this script (eg: the 'matricule' of a student). The file should be edited to customize it.
+This script finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL file. The matching is done
+on a column specified in this script (eg: the 'matricule' of a student). The file should be edited to customize it.
 """
 
 import sys
