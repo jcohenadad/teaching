@@ -15,7 +15,7 @@ fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/202
 fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF 1_20222911_modif.xlsx"
 # Set source and destination columns. WARNING!!! Starts at 1
 col_id_src = 3  # source column of the students 'matricule'
-col_val_src = 9  # source column of the students grade
+col_val_src = 5  # source column of the students grade (eg: '5' corresponds to 'E' on the Excel sheet).
 row_start_src = 1
 col_id_dest = 1  # destination column of the students 'matricule'
 col_val_dest = 4  # destination column of the students grade
@@ -79,6 +79,7 @@ for i in range(row_start_src + 1, n_row_src + 1):
     else:
         # Force it to be a string for subsequent comparison
         id = str(id)
+    logger.info(f"id: {id}")
     # Read value from source file
     val = ws1.cell(row=i, column=col_val_src).value
     # Find index from dest file
@@ -86,11 +87,14 @@ for i in range(row_start_src + 1, n_row_src + 1):
     for i_row in range(1, ws2.max_row + 1):
         for i_col in range(1, ws2.max_column + 1):
             cell = ws2.cell(i_row, i_col).value
+            # For it to be a string for the comparison below
+            cell = str(cell)
             logger.debug(f"id: {id} | Cell ({i_row}, {i_col}): {cell}")
             if cell == id:
                 found = True
                 # Assign value in destination cell
                 ws2.cell(i_row, col_val_dest).value = val
+                logger.info(f"Found matching cell! 🎉")
                 break
     if not found:
         logger.error("Not found :-(")
