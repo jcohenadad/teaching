@@ -48,16 +48,24 @@ def isvalid_cell(value):
     """
     if value is None:
         return False
-    # # First, check if it is an integer
-    # if type(value) is int:
-    #     return
-    # Matricule should be a number
-    if not value.isdigit():
+    # First, check if it is an integer
+    if type(value) is int:
+        # If it is, check if it has 7 digit
+        if len(str(value)) == 7:
+            return True
+        else:
+            return False
+    elif type(value) is str:
+        # Matricule should be a number
+        if not value.isdigit():
+            return False
+        # Matricule should have 7 digits
+        if len(value) == 7:
+            return True
+        else:
+            return False
+    else:
         return False
-    # Matricule should have 7 digits
-    if not len(value) == 7:
-        return False
-    return True
 
 
 # copying the cell values from source
@@ -65,9 +73,12 @@ def isvalid_cell(value):
 for i in range(row_start_src + 1, n_row_src + 1):
     # Read index value from source file
     id = ws1.cell(row=i, column=col_id_src).value
-    # run some checks to make sure this index corresponds to the desired field
+    # Make sure the index is valid
     if not isvalid_cell(id):
         continue
+    else:
+        # Force it to be a string for subsequent comparison
+        id = str(id)
     # Read value from source file
     val = ws1.cell(row=i, column=col_val_src).value
     # Find index from dest file
