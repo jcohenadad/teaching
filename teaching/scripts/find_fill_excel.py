@@ -8,27 +8,29 @@ import sys
 import openpyxl as xl
 from loguru import logger
 
+# Parameters
+fname_source = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/GBM6125-Examen2022-notes.xlsx"
+fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911.xlsx"
+fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911_modif.xlsx"
+
+
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 
 # opening the source excel file
-filename = "/Users/julien/Desktop/src.xlsx"
 # WARNING!!! Starts at 1
 col_id_src = 3
 col_val_src = 9
 row_start_src = 1
-wb1 = xl.load_workbook(filename, read_only=True)
+wb1 = xl.load_workbook(fname_source, read_only=True)
 ws1 = wb1.active
 
 # opening the destination excel file
-filename1 = "/Users/julien/Desktop/dest.xlsx"
-wb2 = xl.load_workbook(filename1)
+wb2 = xl.load_workbook(fname_dest)
 ws2 = wb2.active
 col_id_dest = 1
 col_val_dest = 4
 # row_start_dest = 11
-
-file_out = "/Users/julien/Desktop/dest_modif.xlsx"
 
 # Loop across rows from the src file
 # This is a workaround found in https://localcoder.org/openpyxl-max-row-and-max-column-wrongly-reports-a-larger-figure
@@ -80,6 +82,6 @@ for i in range(row_start_src + 1, n_row_src + 1):
         logger.error("Not found :-(")
 
 # saving the destination excel file
-wb2.save(file_out)
+wb2.save(fname_out)
 
 logger.info("Job done! 🎉")
