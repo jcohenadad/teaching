@@ -17,7 +17,7 @@ fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 
-# opening the source excel file
+# opening the source Excel file
 # WARNING!!! Starts at 1
 col_id_src = 3
 col_val_src = 9
@@ -25,7 +25,7 @@ row_start_src = 1
 wb1 = xl.load_workbook(fname_source, read_only=True)
 ws1 = wb1.active
 
-# opening the destination excel file
+# opening the destination Excel file
 wb2 = xl.load_workbook(fname_dest)
 ws2 = wb2.active
 col_id_dest = 1
@@ -58,7 +58,7 @@ def invalid_cell(value):
 
 
 # copying the cell values from source
-# excel file to destination excel file
+# Excel file to destination Excel file
 for i in range(row_start_src + 1, n_row_src + 1):
     # Read index value from source file
     id = ws1.cell(row=i, column=col_id_src).value
@@ -81,7 +81,7 @@ for i in range(row_start_src + 1, n_row_src + 1):
     if not found:
         logger.error("Not found :-(")
 
-# saving the destination excel file
+# saving the destination Excel file
 wb2.save(fname_out)
 
 logger.info("Job done! 🎉")
