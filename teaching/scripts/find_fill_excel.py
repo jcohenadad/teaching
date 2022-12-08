@@ -11,8 +11,8 @@ from loguru import logger
 # Parameters
 # Set file names
 fname_source = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/GBM6125-Examen2022-notes.xlsx"
-fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911.xlsx"
-fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911_modif.xlsx"
+fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF 1_20222911.xlsx"
+fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF 1_20222911_modif.xlsx"
 # Set source and destination columns. WARNING!!! Starts at 1
 col_id_src = 3  # source column of the students 'matricule'
 col_val_src = 9  # source column of the students grade
@@ -22,7 +22,7 @@ col_val_dest = 4  # destination column of the students grade
 
 
 logger.remove()
-logger.add(sys.stderr, level="INFO")
+logger.add(sys.stderr, level="DEBUG")
 
 # Opening source Excel file
 wb1 = xl.load_workbook(fname_source, read_only=True)
