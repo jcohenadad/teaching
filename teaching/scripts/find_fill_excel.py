@@ -9,28 +9,28 @@ import openpyxl as xl
 from loguru import logger
 
 # Parameters
+# Set file names
 fname_source = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/GBM6125-Examen2022-notes.xlsx"
 fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911.xlsx"
 fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF\ 1_20222911_modif.xlsx"
+# Set source and destination columns. WARNING!!! Starts at 1
+col_id_src = 3  # source column of the students 'matricule'
+col_val_src = 9  # source column of the students grade
+row_start_src = 1
+col_id_dest = 1  # destination column of the students 'matricule'
+col_val_dest = 4  # destination column of the students grade
 
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 
-# opening the source Excel file
-# WARNING!!! Starts at 1
-col_id_src = 3
-col_val_src = 9
-row_start_src = 1
+# Opening source Excel file
 wb1 = xl.load_workbook(fname_source, read_only=True)
 ws1 = wb1.active
 
 # opening the destination Excel file
 wb2 = xl.load_workbook(fname_dest)
 ws2 = wb2.active
-col_id_dest = 1
-col_val_dest = 4
-# row_start_dest = 11
 
 # Loop across rows from the src file
 # This is a workaround found in https://localcoder.org/openpyxl-max-row-and-max-column-wrongly-reports-a-larger-figure
