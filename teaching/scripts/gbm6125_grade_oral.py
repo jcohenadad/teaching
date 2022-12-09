@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Loop across Google Forms, fetch responses, analyze them and output average grade in a CSV file.
-# Specific to the course GBM6125 at Polytechnique Montreal.
+# Useful for the courses GBM6125 and GBM6904 at Polytechnique Montreal.
 #
 # Useful documentation
 # - https://developers.google.com/drive/api/guides/search-files
@@ -93,4 +93,4 @@ for file1 in file_list:
     # Append to dataframe
     df = pd.concat([df, pd.DataFrame({"Students": students, "Grade": gradeAvg}, index=[1])])
 
-df.to_csv('GBM6125_grades_oral.csv')
+df.to_csv('grades_oral.csv')
