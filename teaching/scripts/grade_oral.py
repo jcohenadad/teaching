@@ -68,11 +68,11 @@ for file1 in file_list:
     for i_response in range(len_result):
         value = []
         matricule = ''
+        is_prof = False
         for i, j in result['responses'][i_response]['answers'].items():
             result_item = j['textAnswers']['answers'][0]['value']
             # Hack: because results are not sorted (ie: matricule is not the first item), we need to look for the
             # matricule based on its properties: digit and length of 7.
-            is_prof = False
             if result_item == '000000':
                 # that's me :)
                 matricule = result_item
