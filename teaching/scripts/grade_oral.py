@@ -23,7 +23,7 @@ from oauth2client import client, file, tools
 
 
 # Parameters
-folder_gform = "1DjaqpTOp1QAy042qlFBoCpTY3wDA8lZp"  # Folder that contains all Google Forms
+folder_gform = "10qznFfdxwMXLaty5dqEkFTPoJfdwlGS3"  # Folder that contains all Google Forms
 logging_level = 'DEBUG'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
