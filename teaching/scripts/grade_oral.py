@@ -93,8 +93,9 @@ for file1 in file_list:
             # Student response
             gradeStudent.append(grade)
     # Compute average grade
-    gradeAvg = (gradeProf + np.mean(gradeStudent)) / 2
-    logger.info('grade: {}'.format(gradeAvg))
+    gradeStudentAvg = np.mean(gradeStudent)
+    gradeAvg = (gradeProf + gradeStudentAvg) / 2
+    logger.info(f"grade: {gradeAvg} (StudentAvg: {gradeStudentAvg}, Prof: {gradeProf})")
     # Append to dataframe
     df = pd.concat([df, pd.DataFrame({"Students": students, "Grade": gradeAvg}, index=[1])])
 
