@@ -72,7 +72,10 @@ for file1 in file_list:
             result_item = j['textAnswers']['answers'][0]['value']
             # Hack: because results are not sorted (ie: matricule is not the first item), we need to look for the
             # matricule based on its properties: digit and length of 7.
-            if len(result_item) == 7 and result_item.isdigit():
+            if result_item == '000000':
+                # that's me :)
+                matricule = result_item
+            elif len(result_item) == 7 and result_item.isdigit():
                 matricule = result_item
             elif result_item.isdigit():
                 value.append(result_item)
