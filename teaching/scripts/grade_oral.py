@@ -72,9 +72,11 @@ for file1 in file_list:
             result_item = j['textAnswers']['answers'][0]['value']
             # Hack: because results are not sorted (ie: matricule is not the first item), we need to look for the
             # matricule based on its properties: digit and length of 7.
+            is_prof = False
             if result_item == '000000':
                 # that's me :)
                 matricule = result_item
+                is_prof = True
             elif len(result_item) == 7 and result_item.isdigit():
                 matricule = result_item
             elif result_item.isdigit():
@@ -86,7 +88,7 @@ for file1 in file_list:
             raise RuntimeError('Problem identifying matricule.')
         grade = np.sum([int(i) for i in value])
         logger.debug('Matricule: {} | Grade: {}'.format(matricule, grade))
-        if (matricule == '000000'):
+        if is_prof:
             # Prof response
             gradeProf = grade
         else:
