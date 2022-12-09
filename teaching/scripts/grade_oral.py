@@ -101,4 +101,7 @@ for file1 in file_list:
     # Append to dataframe
     df = pd.concat([df, pd.DataFrame({"Students": students, "Grade": gradeAvg}, index=[1])])
 
-df.to_csv('grades_oral.csv')
+fname_out = 'grades_oral.csv'
+df.to_csv(fname_out)
+logger.info(f"Output save in: {fname_out}")
+logger.info("Job done! 🎉")
