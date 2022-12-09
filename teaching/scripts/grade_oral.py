@@ -71,11 +71,13 @@ for file1 in file_list:
         for i, j in result['responses'][i_response]['answers'].items():
             result_item = j['textAnswers']['answers'][0]['value']
             # Hack: because results are not sorted (ie: matricule is not the first item), we need to look for the
-            # matricule based on the string length.
-            if len(result_item) > 3:
+            # matricule based on its properties: digit and length of 7.
+            if len(result_item) == 7 and result_item.isdigit():
                 matricule = result_item
-            else:
+            elif result_item.isdigit():
                 value.append(result_item)
+            else:
+                logger.debug(f"Comment: {result_item}")
         # Make sure a matricule was found
         if matricule == '':
             raise RuntimeError('Problem identifying matricule.')
