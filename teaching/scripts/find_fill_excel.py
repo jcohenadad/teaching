@@ -10,12 +10,12 @@ from loguru import logger
 
 # Parameters
 # Set file names
-fname_source = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/GBM6125-Examen2022-notes.xlsx"
-fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF 1_20222911.xlsx"
-fname_out = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2022/notes/Cotes_GBM6125_20223_01_Cours_EF 1_20222911_modif.xlsx"
+fname_source = "/Users/julien/Desktop/GBM6904 Grades.xlsx"  # Download from gradebook: https://moodle.polymtl.ca/grade/export/xls/index.php?id=415
+fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/notes/GBM7904/Cotes_GBM7904_20223_01_Cours_TP 1_20222911.xlsx"
+fname_out = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/notes/GBM7904/Cotes_GBM7904_20223_01_Cours_TP 1_20222911_modif.xlsx"
 # Set source and destination columns. WARNING!!! Starts at 1
 col_id_src = 3  # source column of the students 'matricule'
-col_val_src = 5  # source column of the students grade (eg: '5' corresponds to 'E' on the Excel sheet).
+col_val_src = 8  # source column of the students grade (eg: '5' corresponds to 'E' on the Excel sheet).
 row_start_src = 1
 col_id_dest = 1  # destination column of the students 'matricule'
 col_val_dest = 4  # destination column of the students grade
