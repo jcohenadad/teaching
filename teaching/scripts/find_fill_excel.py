@@ -10,7 +10,9 @@ from loguru import logger
 
 # Parameters
 # Set file names
-fname_source = "/Users/julien/Desktop/GBM6904 Grades.xlsx"  # Download from gradebook: https://moodle.polymtl.ca/grade/export/xls/index.php?id=415
+# GBM8378: https://ele.examen.polymtl.ca/grade/export/ods/index.php?id=1412
+# GBM6904: https://moodle.polymtl.ca/grade/export/xls/index.php?id=415
+fname_source = "/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023\ Final-notes.xlsx"
 fname_dest = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/notes/GBM7904/Cotes_GBM7904_20223_01_Cours_TP 1_20222911.xlsx"
 fname_out = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/notes/GBM7904/Cotes_GBM7904_20223_01_Cours_TP 1_20222911_modif.xlsx"
 # Set source and destination columns. WARNING!!! Starts at 1
