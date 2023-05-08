@@ -3,6 +3,7 @@ coloredlogs
 httplib2
 google-api-python-client
 google
+loguru
 oauth2client
 openpyxl
 pandas
