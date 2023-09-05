@@ -13,8 +13,8 @@ from loguru import logger
 # GBM8378: https://ele.examen.polymtl.ca/grade/export/ods/index.php?id=1412
 # GBM6904: https://moodle.polymtl.ca/grade/export/xls/index.php?id=415
 fname_source = "/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx"
-fname_dest = "/Users/julien/Library/CloudStorage/GoogleDrive-julien.cohenadad@gmail.com/My\ Drive/Cours/GBM8378_ImagerieMedicale/GBM8378-2023/notes/Cotes_GBM8378_20231_01_Cours_EF\ 1_20230205.xlsx"
-fname_out = "/Users/julien/Library/CloudStorage/GoogleDrive-julien.cohenadad@gmail.com/My\ Drive/Cours/GBM8378_ImagerieMedicale/GBM8378-2023/notes/Cotes_GBM8378_20231_01_Cours_EF\ 1_20230205_modif.xlsx"
+fname_dest = "Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx"
+fname_out = "Cotes_GBM8378_20231_01_Cours_EF_1_20230205_modif.xlsx"
 # Set source and destination columns. WARNING!!! Starts at 1
 col_id_src = 3  # source column of the students 'matricule'
 col_val_src = 7  # source column of the students grade (eg: '5' corresponds to 'E' on the Excel sheet).
