@@ -34,13 +34,13 @@ def find_non_correspondence(file1, column1, delimiter1, file2, column2, delimite
 
 def main():
     # Take inputs from the user
-    file1 = 'src1.CSV'  #input("Enter the name of the first CSV file: ")
-    column1 = 0  #int(input(f"Enter the column number to match in {file1}: "))
-    delimiter1 = ';'  #input(f"Enter the delimiter for {file1} (e.g., ',' or ';'): ")
+    file1 = input("Enter the name of the first CSV file: ")
+    column1 = int(input(f"Enter the column number to match in {file1}: "))
+    delimiter1 = input(f"Enter the delimiter for {file1} (e.g., ',' or ';'): ")
     
-    file2 = 'dest.csv'  #input("Enter the name of the second CSV file: ")
-    column2 = 1  #int(input(f"Enter the column number to match in {file2}: "))
-    delimiter2 = ','  #input(f"Enter the delimiter for {file2} (e.g., ',' or ';'): ")
+    file2 = input("Enter the name of the second CSV file: ")
+    column2 = int(input(f"Enter the column number to match in {file2}: "))
+    delimiter2 = input(f"Enter the delimiter for {file2} (e.g., ',' or ';'): ")
 
     # Find non-corresponding lines
     non_correspondence1, non_correspondence2 = find_non_correspondence(file1, column1, delimiter1, file2, column2, delimiter2)
