@@ -1,3 +1,7 @@
+# VS code
+.vscode
+
+# Pycharm
 .idea
 teaching.egg-info/
 __pycache__
@@ -8,3 +12,6 @@ __pycache__
 # Google Auth stuff
 client_secrets.json
 token.json
+
+# Venv
+venv/
