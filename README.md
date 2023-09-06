@@ -10,6 +10,11 @@ https://pythonhosted.org/PyDrive/quickstart.html#authentication
 - Enable [Google Forms API](https://console.developers.google.com/apis/api/forms.googleapis.com/overview?project=1036953068115)
 - Enable [Gmail API](https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=1036953068115)
 
+# GBM6904
+
+Generate gforms:
+https://script.google.com/home/projects/1a2_dd4s7rkh1ETUG5TwXsc5jJ1nKXg3aKT9zVfPIFoXhx5kJYpreA1Ry/edit
+
 # Virtual environment
 
 ~~~
