@@ -1,6 +1,11 @@
-import csv
+# Find non-corresponding lines between two CSV files based on specified columns
+# Author: Julien Cohen-Adad
 
-def read_csv(filename, column_number, delimiter):
+import csv
+import argparse
+from typing import List, Tuple
+
+def read_csv(filename: str, column_number: int, delimiter: str) -> List[str]:
     """
     Read a CSV file and return the data in the specified column as a list.
     """
@@ -12,7 +17,7 @@ def read_csv(filename, column_number, delimiter):
                 data.append(row[column_number])
     return data
 
-def find_non_correspondence(file1, column1, delimiter1, file2, column2, delimiter2):
+def find_non_correspondence(file1: str, column1: int, delimiter1: str, file2: str, column2: int, delimiter2: str) -> Tuple[List[int], List[int]]:
     """
     Find lines that do not correspond between two CSV files based on the specified columns.
     """
@@ -24,36 +29,31 @@ def find_non_correspondence(file1, column1, delimiter1, file2, column2, delimite
 
     for i, val1 in enumerate(data1):
         if val1 not in data2:
-            non_correspondence1.append(i)
+            non_correspondence1.append(i + 1)  # Line numbers start from 1
 
     for j, val2 in enumerate(data2):
         if val2 not in data1:
-            non_correspondence2.append(j)
+            non_correspondence2.append(j + 1)  # Line numbers start from 1
 
     return non_correspondence1, non_correspondence2
 
 def main():
-    # Take inputs from the user
-    file1 = input("Enter the name of the first CSV file: ")
-    column1 = int(input(f"Enter the column number to match in {file1}: "))
-    delimiter1 = input(f"Enter the delimiter for {file1} (e.g., ',' or ';'): ")
+    parser = argparse.ArgumentParser(description="Find non-corresponding lines between two CSV files based on specified columns.")
     
-    file2 = input("Enter the name of the second CSV file: ")
-    column2 = int(input(f"Enter the column number to match in {file2}: "))
-    delimiter2 = input(f"Enter the delimiter for {file2} (e.g., ',' or ';'): ")
-
-    # Find non-corresponding lines
-    non_correspondence1, non_correspondence2 = find_non_correspondence(file1, column1, delimiter1, file2, column2, delimiter2)
-
-    # Print the results
-    if non_correspondence1 or non_correspondence2:
-        print("Lines that do not have corresponding matches:")
-        for i in non_correspondence1:
-            print(f"Line {i+1} in {file1} does not have a corresponding match in {file2}.")
-        for j in non_correspondence2:
-            print(f"Line {j+1} in {file2} does not have a corresponding match in {file1}.")
-    else:
-        print("All lines have corresponding matches between the two files.")
+    parser.add_argument("file1", help="Name of the first CSV file")
+    parser.add_argument("--column1", type=int, default=0, help="Column number to match in the first file (default is 0)")
+    parser.add_argument("--delimiter1", default=",", help="Delimiter for the first file (default is ',')")
+    
+    parser.add_argument("file2", help="Name of the second CSV file")
+    parser.add_argument("--column2", type=int, default=1, help="Column number to match in the second file (default is 1)")
+    parser.add_argument("--delimiter2", default=",", help="Delimiter for the second file (default is ',')")
+    
+    args = parser.parse_args()
+    
+    non_correspondence1, non_correspondence2 = find_non_correspondence(args.file1, args.column1, args.delimiter1, args.file2, args.column2, args.delimiter2)
+    
+    print(f"Lines in {args.file1} that do not have a corresponding match in {args.file2}: {non_correspondence1}")
+    print(f"Lines in {args.file2} that do not have a corresponding match in {args.file1}: {non_correspondence2}")
 
 if __name__ == '__main__':
     main()
