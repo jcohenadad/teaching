@@ -46,6 +46,8 @@ coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 def get_parameters():
     parser = argparse.ArgumentParser(description="""
     Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
+    parser.add_argument('matricule',
+                        help="Student matricule. Used to fetch the email address.")
     parser.add_argument('url',
                         help="URL of the Google Form")
     args = parser.parse_args()
@@ -60,6 +62,7 @@ def main():
 
     # Get input parameters
     args = get_parameters()
+    matricule = args.matricule
     gform_url = args.url
 
     # Google API auth
