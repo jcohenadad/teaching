@@ -4,8 +4,9 @@
 #
 # How to use:
 # - Open the gsheet with the list of presentations
-# - Copy the URL of the gform for the student to send the feedback to
-# - Input in this function
+# - Open the URL of the gform for the student to send the feedback to
+# - On the gform, click "edit", and then copy the new URL of the gform.
+# - Run this function using that URL
 #
 # The file "client_secrets.json" need to be present in the working directory.
 #
