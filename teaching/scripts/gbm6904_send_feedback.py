@@ -33,7 +33,7 @@ from googleapiclient.errors import HttpError
 title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
-path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2022/GBM6904-7904-20223-01C.csv"
+path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
 logging_level = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
