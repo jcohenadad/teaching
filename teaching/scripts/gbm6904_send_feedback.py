@@ -4,7 +4,7 @@
 #
 # How to use:
 # - Open the gsheet with the list of presentations
-# - Copy the URL of the student to send the feedback to
+# - Copy the URL of the gform for the student to send the feedback to
 # - Input in this function
 #
 # The file "client_secrets.json" need to be present in the working directory.
@@ -45,8 +45,6 @@ coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
 def get_parameters():
     parser = argparse.ArgumentParser(description="""
     Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
-    parser.add_argument('matricule',
-                        help="Student matricule. Used to fetch the email address.")
     parser.add_argument('url',
                         help="URL of the Google Form")
     args = parser.parse_args()
@@ -62,7 +60,6 @@ def main():
     # Get input parameters
     args = get_parameters()
     gform_url = args.url
-    matricule = args.matricule
 
     # Google API auth
     SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
