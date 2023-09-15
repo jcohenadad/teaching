@@ -59,6 +59,12 @@ def get_parameters():
     return args
 
 
+def expand_url(short_url):
+    # Follow the shortened URL to its destination
+    response = requests.get(short_url, allow_redirects=True)
+    return response.url
+
+
 def main():
     """
     :param args:
@@ -69,10 +75,6 @@ def main():
     args = get_parameters()
     matricule = args.matricule
     gform_url = args.url
-
-
-
-
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
@@ -96,47 +98,8 @@ def main():
     forms_service = build('drive', 'v3', credentials=creds)
     forms_service = build('forms', 'v1', credentials=creds)
 
-    # OLD Authentication method
-    # -------------------------
-    # # Google API auth
-    # SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
-    #           "https://www.googleapis.com/auth/forms.responses.readonly"]
-    # DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-    # store = file.Storage('token.json')  # TODO: use token.json!
-    # creds = None
-    # if not creds or creds.invalid:
-    #     flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-    #     # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
-    #     # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
-    #     parser = argparse.ArgumentParser(
-    #         description=__doc__,
-    #         formatter_class=argparse.RawDescriptionHelpFormatter,
-    #         parents=[tools.argparser])
-    #     # flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
-    #     flags = parser.parse_args([])
-    #     creds = tools.run_flow(flow, store, flags=flags)
-    # forms_service = discovery.build('forms', 'v1', http=creds.authorize(
-    #     Http()), forms_serviceUrl=DISCOVERY_DOC, static_discovery=False)
-
-
-
-
-    def expand_url(short_url):
-        # Follow the shortened URL to its destination
-        response = requests.get(short_url, allow_redirects=True)
-        return response.url
-
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
-
-    # Get ID from URL
-    # gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
-
-    # List gforms in the Google Drive folder
-    # from google.oauth2.credentials import Credentials
-    # creds = Credentials.from_authorized_user('client_secrets.json')
-    # forms_service = build('drive', 'v3', credentials=creds)
-    # forms_service = build('forms', 'v1', credentials=creds)
 
     results = forms_service.files().list(q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.form'",
                                         fields="files(id, name)").execute()
