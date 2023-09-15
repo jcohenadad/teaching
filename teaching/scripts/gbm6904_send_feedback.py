@@ -18,18 +18,17 @@
 # Author: Julien Cohen-Adad
 
 import argparse
-import coloredlogs
 import csv
 import logging
-from httplib2 import Http
-from oauth2client import client, file, tools
-import pickle
-import requests
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
 import base64
+import pickle
 from email.message import EmailMessage
-from googleapiclient import discovery
+
+import coloredlogs
+
+import requests
+from oauth2client import client, file, tools
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -95,13 +94,13 @@ def main():
         creds = pickle.load(token)
 
     # Build the forms_service objects for both APIs
-    forms_service = build('drive', 'v3', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
     forms_service = build('forms', 'v1', credentials=creds)
 
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
 
-    results = forms_service.files().list(q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.form'",
+    results = drive_service.files().list(q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.form'",
                                         fields="files(id, name)").execute()
     items = results.get('files', [])
 
