@@ -12,6 +12,7 @@ __pycache__
 # Google Auth stuff
 client_secrets.json
 token.json
+token.pickle
 
 # Venv
 venv/
