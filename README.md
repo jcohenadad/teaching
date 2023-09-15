@@ -12,8 +12,7 @@ https://pythonhosted.org/PyDrive/quickstart.html#authentication
 
 # GBM6904
 
-Generate gforms:
-https://script.google.com/home/projects/1a2_dd4s7rkh1ETUG5TwXsc5jJ1nKXg3aKT9zVfPIFoXhx5kJYpreA1Ry/edit
+Generate gforms with Google AppsScript: [GBM6904_CreateForm](https://script.google.com/home/projects/1a2_dd4s7rkh1ETUG5TwXsc5jJ1nKXg3aKT9zVfPIFoXhx5kJYpreA1Ry/edit)
 
 # Virtual environment
 
