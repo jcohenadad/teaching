@@ -23,6 +23,10 @@ import csv
 import logging
 from httplib2 import Http
 from oauth2client import client, file, tools
+import pickle
+import requests
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
 import base64
 from email.message import EmailMessage
 from googleapiclient import discovery
@@ -31,6 +35,7 @@ from googleapiclient.errors import HttpError
 
 
 # Parameters
+folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # TODO: input full URL in script and remove "https://drive.google.com/drive/folders/"
 title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
@@ -65,32 +70,98 @@ def main():
     matricule = args.matricule
     gform_url = args.url
 
-    # Google API auth
-    SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
-              "https://www.googleapis.com/auth/forms.responses.readonly"]
-    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-    store = file.Storage('token.json')
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-        # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
-        # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
-        parser = argparse.ArgumentParser(
-            description=__doc__,
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            parents=[tools.argparser])
-        # flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
-        flags = parser.parse_args([])
-        creds = tools.run_flow(flow, store, flags=flags)
-    service = discovery.build('forms', 'v1', http=creds.authorize(
-        Http()), discoveryServiceUrl=DISCOVERY_DOC, static_discovery=False)
+
+
+
+
+    SCOPES = [
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/forms",
+    ]
+
+    # Load the client secrets and perform authentication
+    flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
+    creds = flow.run_local_server(port=8080)  # This will open a browser window for authentication
+
+    # Save the credentials for the next run
+    with open('token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+
+
+    # Load the stored credentials
+    with open('token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+
+    # Build the forms_service objects for both APIs
+    forms_service = build('drive', 'v3', credentials=creds)
+    forms_service = build('forms', 'v1', credentials=creds)
+
+    # OLD Authentication method
+    # -------------------------
+    # # Google API auth
+    # SCOPES = ["https://www.googleapis.com/auth/forms.body.readonly",
+    #           "https://www.googleapis.com/auth/forms.responses.readonly"]
+    # DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+    # store = file.Storage('token.json')  # TODO: use token.json!
+    # creds = None
+    # if not creds or creds.invalid:
+    #     flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
+    #     # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
+    #     # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
+    #     parser = argparse.ArgumentParser(
+    #         description=__doc__,
+    #         formatter_class=argparse.RawDescriptionHelpFormatter,
+    #         parents=[tools.argparser])
+    #     # flags = parser.parse_args(['--client-id', '', '--client-secret', ''])
+    #     flags = parser.parse_args([])
+    #     creds = tools.run_flow(flow, store, flags=flags)
+    # forms_service = discovery.build('forms', 'v1', http=creds.authorize(
+    #     Http()), forms_serviceUrl=DISCOVERY_DOC, static_discovery=False)
+
+
+
+
+    def expand_url(short_url):
+        # Follow the shortened URL to its destination
+        response = requests.get(short_url, allow_redirects=True)
+        return response.url
+
+    # Get expanded URL from shorten URL (listed in gsheet)
+    gform_url_expanded = expand_url(gform_url)
 
     # Get ID from URL
-    gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
+    # gform_id = gform_url.removeprefix('https://docs.google.com/forms/d/').removesuffix('/viewform')
 
-    # Get form metadata to get students' name
-    result_metadata = service.forms().get(formId=gform_id).execute()
-    student = result_metadata['info']['title']
+    # List gforms in the Google Drive folder
+    # from google.oauth2.credentials import Credentials
+    # creds = Credentials.from_authorized_user('client_secrets.json')
+    # forms_service = build('drive', 'v3', credentials=creds)
+    # forms_service = build('forms', 'v1', credentials=creds)
+
+    results = forms_service.files().list(q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.form'",
+                                        fields="files(id, name)").execute()
+    items = results.get('files', [])
+
+    logger.info("Fetching the associated Google Form edit URL")
+    # TODO replace with function
+    gform_id = ''
+    for item in items:
+        # Fetch form details using the Forms API
+        form_details = forms_service.forms().get(formId=item['id']).execute()
+        # Extract the viewform URL
+        viewform_url = form_details['responderUri']
+        # Check if it corresponds to the target URL
+        if viewform_url == gform_url_expanded:
+            gform_id = item['id']
+            logger.info(f"Found matched gform ID: {gform_id}")
+    if gform_id == '':
+        raise('Did not find matching edit URL.')
+
+
+    # Get form metadata
+    result_metadata = forms_service.forms().get(formId=gform_id).execute()
+    # student = result_metadata['info']['title']
+
     # Get questionID of the feedback
     questionId = ''
     for item in result_metadata['items']:
@@ -101,10 +172,11 @@ def main():
         raise RuntimeError
 
     # Get form responses
-    result = service.forms().responses().list(formId=gform_id).execute()
+    results = forms_service.forms().responses().list(formId=gform_id).execute()
+
     # Loop across all responses and append student's feedback
     feedback = []
-    for responses in result['responses']:
+    for responses in results['responses']:
         logger.debug(responses)
         if questionId in responses['answers'].keys():
             feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
@@ -169,7 +241,7 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
         creds = tools.run_flow(flow, store, flags=flags)
 
     try:
-        service = build('gmail', 'v1', credentials=creds)
+        forms_service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
 
         message.set_content(email_body)
@@ -185,7 +257,7 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
             'raw': encoded_message
         }
         # pylint: disable=E1101
-        send_message = (service.users().messages().send
+        send_message = (forms_service.users().messages().send
                         (userId="me", body=create_message).execute())
         print(F'Message Id: {send_message["id"]}')
     except HttpError as error:

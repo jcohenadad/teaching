@@ -2,6 +2,7 @@ apiclient
 coloredlogs
 httplib2
 google-api-python-client
+google-auth-oauthlib
 google
 loguru
 oauth2client
