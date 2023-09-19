@@ -59,8 +59,16 @@ def get_parameters():
 
 
 def expand_url(short_url):
+    """Expand URL from short URL
+
+    Args:
+        short_url (str): Short URL
+
+    Returns:
+        str: Long URL
+    """
     # Follow the shortened URL to its destination
-    response = requests.get(short_url, allow_redirects=True)
+    response = requests.get(short_url, allow_redirects=True, timeout=10)
     return response.url
 
 
