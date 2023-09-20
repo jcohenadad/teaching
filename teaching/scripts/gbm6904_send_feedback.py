@@ -112,7 +112,7 @@ def main():
                                         fields="files(id, name)").execute()
     items = results.get('files', [])
 
-    logger.info("Fetching the associated Google Form edit URL")
+    logger.info("Fetching the associated Google Form edit URL...")
     # TODO replace with function
     gform_id = ''
     for item in items:
@@ -141,6 +141,15 @@ def main():
         logger.error('questionId could not be retrieved. Check question title.')
         raise RuntimeError
 
+    # Get matriculeID of the evaluator
+    matriculeId = ''
+    for item in result_metadata['items']:
+        logger.debug(item['title'])
+        if item['title'] == 'Votre matricule étudiant :':
+            matriculeId = item['questionItem']['question']['questionId']
+    if matriculeId == '':
+        logger.warning('Problem identifying matricule.')
+
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
 
@@ -149,9 +158,12 @@ def main():
     for responses in results['responses']:
         logger.debug(responses)
         if questionId in responses['answers'].keys():
+            # Check if feedback is from Julien (matricule='000000')
+            if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
+                feedback.append("Commentaires de Julien Cohen-Adad: ")
             feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
 
-    # TODO: email text to student
+    # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
     email_body = \
