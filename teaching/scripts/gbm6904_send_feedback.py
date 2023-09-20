@@ -21,6 +21,7 @@ import argparse
 import csv
 import logging
 import base64
+import os
 import pickle
 from email.message import EmailMessage
 
@@ -88,18 +89,25 @@ def main():
         "https://www.googleapis.com/auth/forms",
     ]
 
-    # Load the client secrets and perform authentication
-    flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
-    creds = flow.run_local_server(port=8080)  # This will open a browser window for authentication
+    creds = None
 
-    # Save the credentials for the next run
-    with open('token.pickle', 'wb') as token:
-        pickle.dump(creds, token)
+    # Check if the token.pickle file exists. If so, load it
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
 
+    # If there are no (valid) credentials available, prompt the user to log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
+            # Open a browser window for authentication
+            creds = flow.run_local_server(port=8080)
 
-    # Load the stored credentials
-    with open('token.pickle', 'rb') as token:
-        creds = pickle.load(token)
+        # Save the credentials for future runs
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
 
     # Build the forms_service objects for both APIs
     drive_service = build('drive', 'v3', credentials=creds)
