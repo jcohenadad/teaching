@@ -166,10 +166,11 @@ def main():
     for responses in results['responses']:
         logger.debug(responses)
         if questionId in responses['answers'].keys():
+            feedback_individual = responses['answers'][questionId]['textAnswers']['answers'][0]['value']
             # Check if feedback is from Julien (matricule='000000')
             if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
-                feedback.append("Commentaires de Julien Cohen-Adad: ")
-            feedback.append(responses['answers'][questionId]['textAnswers']['answers'][0]['value'])
+                feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
+            feedback.append(feedback_individual)
 
     # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
