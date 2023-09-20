@@ -171,7 +171,14 @@ def main():
         "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
         "ci-dessous correspond au feedback d'un étudiant.\n\n"
     email_body += "- " + "\n- ".join(feedback)
-    gmail_send_message(email_to, email_subject, email_body)
+    # Printout message in Terminal and ask for confirmation before sending
+    logger.info(email_body)
+    send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
+    if send_prompt == "":
+        print("Message sent!")
+        gmail_send_message(email_to, email_subject, email_body)
+    else:
+        print("Cancelled.")
 
 
 def fetch_email_address(matricule: str, path_csv: str) -> str:
