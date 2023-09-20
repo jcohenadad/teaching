@@ -224,6 +224,7 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
     :param email_body: Body of the email
     :return:
     """
+    # TODO: do the authentication with the code above (to avoid doing it twice)
     SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
     store = file.Storage('token.json')
     creds = None
