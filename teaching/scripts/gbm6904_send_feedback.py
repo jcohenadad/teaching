@@ -190,6 +190,9 @@ def main():
                 feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
             feedback.append(feedback_individual)
 
+    # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
+    logger.info(f"✍️ Number of responses: {len(results['responses'])}")
+
     # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
