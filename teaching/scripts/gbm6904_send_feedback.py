@@ -27,7 +27,7 @@ from email.message import EmailMessage
 
 import coloredlogs
 
-import requests  # TODO: remove double usage of requests
+from requests import get
 from oauth2client import client, file, tools
 from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -69,7 +69,7 @@ def expand_url(short_url):
         str: Long URL
     """
     # Follow the shortened URL to its destination
-    response = requests.get(short_url, allow_redirects=True, timeout=10)
+    response = get(short_url, allow_redirects=True, timeout=10)
     return response.url
 
 
