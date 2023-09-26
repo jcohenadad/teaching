@@ -191,7 +191,7 @@ def main():
             feedback.append(feedback_individual)
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
-    logger.info(f"✍️ Number of responses: {len(results['responses'])}")
+    logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
 
     # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
@@ -202,7 +202,7 @@ def main():
         "ci-dessous correspond au feedback d'un étudiant.\n\n"
     email_body += "- " + "\n- ".join(feedback)
     # Printout message in Terminal and ask for confirmation before sending
-    logger.info(email_body)
+    logger.info('\nEmail to send:' + email_body)
     send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
     if send_prompt == "":
         print("Message sent!")
