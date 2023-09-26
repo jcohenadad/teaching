@@ -27,15 +27,17 @@ from email.message import EmailMessage
 
 import coloredlogs
 
-import requests
+import requests  # TODO: remove double usage of requests
 from oauth2client import client, file, tools
+from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
 # Parameters
-folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # TODO: input full URL in script and remove "https://drive.google.com/drive/folders/"
+folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
 title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
@@ -53,8 +55,6 @@ def get_parameters():
     Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
-    parser.add_argument('url',
-                        help="URL of the Google Form")
     args = parser.parse_args()
     return args
 
@@ -82,11 +82,11 @@ def main():
     # Get input parameters
     args = get_parameters()
     matricule = args.matricule
-    gform_url = args.url
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
         "https://www.googleapis.com/auth/forms",
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
     ]
 
     creds = None
@@ -99,7 +99,8 @@ def main():
     # If there are no (valid) credentials available, prompt the user to log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            request = requests.Request()
+            creds.refresh(request)
         else:
             flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
             # Open a browser window for authentication
@@ -112,6 +113,23 @@ def main():
     # Build the forms_service objects for both APIs
     drive_service = build('drive', 'v3', credentials=creds)
     forms_service = build('forms', 'v1', credentials=creds)
+    sheets_service = build('sheets', 'v4', credentials=creds)
+
+    # Find the gform URL from the Matricule on the gsheet
+    INPUT_COLUMN_INDEX = 1  # column corresponding to the matricule (starts at 0)
+    OUTPUT_COLUMN_INDEX = 5  # column corresponding to the gform URL
+    sheet = sheets_service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range='Sheet1').execute()
+    values = result.get('values', [])
+    gform_url = None
+    for row in values:
+        if row[INPUT_COLUMN_INDEX] == matricule:
+            gform_url = row[OUTPUT_COLUMN_INDEX]
+            break
+    if gform_url is not None:
+        logger.info(f"Found gform URL: {gform_url}")
+    else:
+        raise RuntimeError('Did not find matching gform URL.')
 
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
