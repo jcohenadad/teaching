@@ -86,7 +86,8 @@ def main():
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
         "https://www.googleapis.com/auth/forms",
-        "https://www.googleapis.com/auth/spreadsheets.readonly"
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/gmail.send"
     ]
 
     creds = None
@@ -153,7 +154,6 @@ def main():
     if gform_id == '':
         raise RuntimeError('Did not find matching edit URL.')
 
-
     # Get form metadata
     result_metadata = forms_service.forms().get(formId=gform_id).execute()
     # student = result_metadata['info']['title']
@@ -203,7 +203,7 @@ def main():
     send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
     if send_prompt == "":
         print("Message sent!")
-        gmail_send_message(email_to, email_subject, email_body)
+        gmail_send_message(email_to, email_subject, email_body, creds)
     else:
         print("Cancelled.")
 
@@ -229,7 +229,7 @@ def fetch_email_address(matricule: str, path_csv: str) -> str:
         raise RuntimeError
 
 
-def gmail_send_message(email_to: str, subject: str, email_body: str):
+def gmail_send_message(email_to: str, subject: str, email_body: str, creds):
     """Create and send an email message
     Print the returned  message id
     Returns: Message object, including message id
@@ -243,19 +243,19 @@ def gmail_send_message(email_to: str, subject: str, email_body: str):
     :return:
     """
     # TODO: do the authentication with the code above (to avoid doing it twice)
-    SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
-    store = file.Storage('token.json')
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-        # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
-        # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
-        parser = argparse.ArgumentParser(
-            description=__doc__,
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            parents=[tools.argparser])
-        flags = parser.parse_args([])
-        creds = tools.run_flow(flow, store, flags=flags)
+    # SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+    # store = file.Storage('token.json')
+    # creds = None
+    # if not creds or creds.invalid:
+    #     flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
+    #     # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
+    #     # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
+    #     parser = argparse.ArgumentParser(
+    #         description=__doc__,
+    #         formatter_class=argparse.RawDescriptionHelpFormatter,
+    #         parents=[tools.argparser])
+    #     flags = parser.parse_args([])
+    #     creds = tools.run_flow(flow, store, flags=flags)
 
     try:
         forms_service = build('gmail', 'v1', credentials=creds)
