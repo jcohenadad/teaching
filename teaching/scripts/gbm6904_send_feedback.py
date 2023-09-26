@@ -151,7 +151,7 @@ def main():
             gform_id = item['id']
             logger.info(f"Found matched gform ID: {gform_id}")
     if gform_id == '':
-        raise('Did not find matching edit URL.')
+        raise RuntimeError('Did not find matching edit URL.')
 
 
     # Get form metadata
