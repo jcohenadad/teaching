@@ -199,7 +199,7 @@ def main():
     email_body = \
         "Bonjour,\n\n" \
         "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
-        "ci-dessous correspond au feedback d'un étudiant.\n\n"
+        "ci-dessous correspond au feedback d'un étudiant ou de l'enseignant.\n\n"
     email_body += "- " + "\n- ".join(feedback)
     # Printout message in Terminal and ask for confirmation before sending
     logger.info('\nEmail to send:' + email_body)
