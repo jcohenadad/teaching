@@ -195,6 +195,9 @@ def main():
     # Use iloc to extract feedback for the specific question by its index
     feedback_series = df.iloc[:, feedbackId]  # Column at position 11
 
+    # Remove nan (no evaluation)
+    feedback_series = feedback_series.dropna()
+
     # Transform the series based on the 'matriculeId' condition
     def process_feedback(feedback_value, matricule_value):
         if matricule_value == '000000':
