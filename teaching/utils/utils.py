@@ -61,4 +61,4 @@ def fetch_responses(results, result_metadata):
     ordered_columns = [question_lookup[question_id] for question_id in question_lookup]
     df = df[ordered_columns]
 
-    return df
+    return df, ordered_columns
