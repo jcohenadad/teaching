@@ -169,23 +169,23 @@ def main():
     result_metadata = forms_service.forms().get(formId=gform_id).execute()
     # student = result_metadata['info']['title']
 
-    # Get questionID of the feedback
-    questionId = ''
-    for item in result_metadata['items']:
-        if item['title'] == title_feedback:
-            questionId = item['questionItem']['question']['questionId']
-    if questionId == '':
-        logger.error('questionId could not be retrieved. Check question title.')
-        raise RuntimeError
+    # # Get questionID of the feedback
+    # questionId = ''
+    # for item in result_metadata['items']:
+    #     if item['title'] == title_feedback:
+    #         questionId = item['questionItem']['question']['questionId']
+    # if questionId == '':
+    #     logger.error('questionId could not be retrieved. Check question title.')
+    #     raise RuntimeError
 
-    # Get matriculeID of the evaluator
-    matriculeId = ''
-    for item in result_metadata['items']:
-        logger.debug(item['title'])
-        if item['title'] == 'Votre matricule étudiant :':
-            matriculeId = item['questionItem']['question']['questionId']
-    if matriculeId == '':
-        logger.warning('Problem identifying matricule.')
+    # # Get matriculeID of the evaluator
+    # matriculeId = ''
+    # for item in result_metadata['items']:
+    #     logger.debug(item['title'])
+    #     if item['title'] == 'Votre matricule étudiant :':
+    #         matriculeId = item['questionItem']['question']['questionId']
+    # if matriculeId == '':
+    #     logger.warning('Problem identifying matricule.')
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
