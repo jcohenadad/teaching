@@ -42,6 +42,7 @@ from utils.utils import fetch_responses
 folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
 matriculeId = 0  # ID of the question corresponding to the matricule
+matriculeJulien = '000000'
 feedbackId = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
@@ -191,33 +192,39 @@ def main():
 
     df = fetch_responses(results=results, result_metadata=result_metadata)
 
+    # Compute average grade for each response
+    # ---------------------------------------
+    # Extract columns corresponding to graded questions
+    subset_df = df[ordered_columns[1:10]]
+    # Print out the questions and their averages
+    for question in subset_df.columns:
+        # dropna to ensure NaN values don't affect the average
+        response_series = df[question].dropna().astype(float)
+        # Identify row where matricule is '000000'
+        matricule_series = df.iloc[:, matriculeId]
+        julien_avg = response_series[matricule_series == matriculeJulien].mean()
+        # Identify rows where matricule is not '000000' and compute their average
+        student_avg = response_series[matricule_series != '000000'].mean()
+        # Compute the weighted average
+        weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
+        max_score = 5 # TODO: fetch that
+        print(f"{question}: {weighted_avg:.2f}/{max_score}")
+
     # Loop across all responses and append student's feedback
+    # -------------------------------------------------------
     # Use iloc to extract feedback for the specific question by its index
     feedback_series = df.iloc[:, feedbackId]  # Column at position 11
-
     # Remove nan (no evaluation)
     feedback_series = feedback_series.dropna()
-
     # Transform the series based on the 'matriculeId' condition
     def process_feedback(feedback_value, matricule_value):
-        if matricule_value == '000000':
+        if matricule_value == matriculeJulien:
             return "Commentaires de Julien Cohen-Adad: " + feedback_value
         return feedback_value
-
     matricule_series = df.iloc[:, matriculeId]  # Adjust this to the index of the 'matriculeId' column
-
     feedback = [process_feedback(feedback_value, matricule_value) 
                 for feedback_value, matricule_value in zip(feedback_series, matricule_series)]
 
-    # feedback = []
-    # for responses in results['responses']:
-    #     logger.debug(responses)
-    #     if questionId in responses['answers'].keys():
-    #         feedback_individual = responses['answers'][questionId]['textAnswers']['answers'][0]['value']
-    #         # Check if feedback is from Julien (matricule='000000')
-    #         if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
-    #             feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
-    #         feedback.append(feedback_individual)
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
