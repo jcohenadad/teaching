@@ -196,6 +196,7 @@ def main():
     # ---------------------------------------
     # Extract columns corresponding to graded questions
     subset_df = df[ordered_columns[1:10]]
+    averages_list = []
     # Print out the questions and their averages
     for question in subset_df.columns:
         # dropna to ensure NaN values don't affect the average
@@ -208,12 +209,13 @@ def main():
         # Compute the weighted average
         weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
         max_score = 5 # TODO: fetch that
-        print(f"{question}: {weighted_avg:.2f}/{max_score}")
+        averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
+    # TODO: move the code above to utils to be reused when grading
 
     # Loop across all responses and append student's feedback
     # -------------------------------------------------------
     # Use iloc to extract feedback for the specific question by its index
-    feedback_series = df.iloc[:, feedbackId]  # Column at position 11
+    feedback_series = df.iloc[:, feedbackId]
     # Remove nan (no evaluation)
     feedback_series = feedback_series.dropna()
     # Transform the series based on the 'matriculeId' condition
