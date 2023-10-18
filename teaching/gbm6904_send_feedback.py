@@ -21,6 +21,7 @@ import argparse
 import csv
 import logging
 import base64
+import numpy as np
 import os
 import pickle
 from email.message import EmailMessage
@@ -33,6 +34,8 @@ from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+from utils.utils import fetch_responses
 
 
 # Parameters
@@ -71,6 +74,11 @@ def expand_url(short_url):
     # Follow the shortened URL to its destination
     response = get(short_url, allow_redirects=True, timeout=10)
     return response.url
+
+    # Compute average grade
+    gradeStudentAvg = np.mean(gradeStudent)
+    gradeAvg = (gradeProf + gradeStudentAvg) / 2
+    logger.info(f"grade: {gradeAvg} (StudentAvg: {gradeStudentAvg}, Prof: {gradeProf})")
 
 
 def main():
@@ -178,6 +186,8 @@ def main():
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
+
+    results_gform = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Loop across all responses and append student's feedback
     feedback = []
