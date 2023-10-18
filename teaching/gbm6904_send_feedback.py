@@ -41,7 +41,8 @@ from utils.utils import fetch_responses
 # Parameters
 folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
-title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
+matriculeId = 0  # ID of the question corresponding to the matricule
+feedbackId = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
 path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
@@ -188,18 +189,32 @@ def main():
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
 
-    results_gform = fetch_responses(results=results, result_metadata=result_metadata)
+    df = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Loop across all responses and append student's feedback
-    feedback = []
-    for responses in results['responses']:
-        logger.debug(responses)
-        if questionId in responses['answers'].keys():
-            feedback_individual = responses['answers'][questionId]['textAnswers']['answers'][0]['value']
-            # Check if feedback is from Julien (matricule='000000')
-            if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
-                feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
-            feedback.append(feedback_individual)
+    # Use iloc to extract feedback for the specific question by its index
+    feedback_series = df.iloc[:, feedbackId]  # Column at position 11
+
+    # Transform the series based on the 'matriculeId' condition
+    def process_feedback(feedback_value, matricule_value):
+        if matricule_value == '000000':
+            return "Commentaires de Julien Cohen-Adad: " + feedback_value
+        return feedback_value
+
+    matricule_series = df.iloc[:, matriculeId]  # Adjust this to the index of the 'matriculeId' column
+
+    feedback = [process_feedback(feedback_value, matricule_value) 
+                for feedback_value, matricule_value in zip(feedback_series, matricule_series)]
+
+    # feedback = []
+    # for responses in results['responses']:
+    #     logger.debug(responses)
+    #     if questionId in responses['answers'].keys():
+    #         feedback_individual = responses['answers'][questionId]['textAnswers']['answers'][0]['value']
+    #         # Check if feedback is from Julien (matricule='000000')
+    #         if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
+    #             feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
+    #         feedback.append(feedback_individual)
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
