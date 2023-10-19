@@ -232,11 +232,10 @@ def main():
     def process_feedback(feedback_value, matricule_value):
         if matricule_value == matriculeJulien:
             return "Commentaires de Julien Cohen-Adad: " + feedback_value
-        return feedback_value
-    matricule_series = df.iloc[:, matriculeId]  # Adjust this to the index of the 'matriculeId' column
+        return feedback_value['response']
+    matricule_series = df.iloc[:, matriculeId]
     feedback = [process_feedback(feedback_value, matricule_value) 
                 for feedback_value, matricule_value in zip(feedback_series, matricule_series)]
-
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
