@@ -21,7 +21,9 @@ import argparse
 import csv
 import logging
 import base64
+import numpy as np
 import os
+import pandas as pd
 import pickle
 from email.message import EmailMessage
 
@@ -34,11 +36,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from utils.utils import fetch_responses
+
 
 # Parameters
 folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
-title_feedback = "S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)"  # title of the question (required to retrieve the questionId
+matriculeId = 0  # ID of the question corresponding to the matricule
+matriculeJulien = '000000'
+feedbackId = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
 email_from = "jcohen@polymtl.ca"
 path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
@@ -71,6 +77,11 @@ def expand_url(short_url):
     # Follow the shortened URL to its destination
     response = get(short_url, allow_redirects=True, timeout=10)
     return response.url
+
+    # Compute average grade
+    gradeStudentAvg = np.mean(gradeStudent)
+    gradeAvg = (gradeProf + gradeStudentAvg) / 2
+    logger.info(f"grade: {gradeAvg} (StudentAvg: {gradeStudentAvg}, Prof: {gradeProf})")
 
 
 def main():
@@ -153,42 +164,64 @@ def main():
             logger.info(f"Found matched gform ID: {gform_id}")
     if gform_id == '':
         raise RuntimeError('Did not find matching edit URL.')
+    # gform_id = "1Bfn5PwXRnk8sMNgV2I_n7-KBYB-FQ8EMuoEeLb6r1s0"  # DEBUG JULIEN
 
     # Get form metadata
     result_metadata = forms_service.forms().get(formId=gform_id).execute()
-    # student = result_metadata['info']['title']
-
-    # Get questionID of the feedback
-    questionId = ''
-    for item in result_metadata['items']:
-        if item['title'] == title_feedback:
-            questionId = item['questionItem']['question']['questionId']
-    if questionId == '':
-        logger.error('questionId could not be retrieved. Check question title.')
-        raise RuntimeError
-
-    # Get matriculeID of the evaluator
-    matriculeId = ''
-    for item in result_metadata['items']:
-        logger.debug(item['title'])
-        if item['title'] == 'Votre matricule étudiant :':
-            matriculeId = item['questionItem']['question']['questionId']
-    if matriculeId == '':
-        logger.warning('Problem identifying matricule.')
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
 
+    df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
+
+    # Compute average grade for each response
+    # ---------------------------------------
+    # Extract columns corresponding to graded questions
+    subset_df = df[ordered_columns[1:10]]
+    averages_list = []
+    # Print out the questions and their averages
+    for question in subset_df.columns:
+        # Extracting the response and max score values from the nested dictionaries
+        response_series = df[question].apply(lambda x: float(x['response']) if pd.notnull(x) else np.nan).dropna()
+        max_score_series = df[question].apply(lambda x: x['max_score'] if pd.notnull(x) else np.nan).dropna()
+        # Since all max scores for a particular question should be the same, 
+        # just fetch the first value for the max score of this question
+        max_score = max_score_series.iloc[0] if not max_score_series.empty else None
+        # If we couldn't find a max score, default to 5 (or you can handle this differently)
+        if max_score is None:
+            raise ValueError(f"Max score not found for question: '{question}'")
+        # Fetch all matricule rows
+        matricule_series = df.iloc[:, matriculeId]  # Assuming you have a matricule_column_name defined above
+        # Extracting just the response value from matricule_series
+        matricule_response_series = matricule_series.apply(lambda x: x['response'] if isinstance(x, dict) else None)
+        # Compute the average for Julien's rows
+        julien_avg = response_series[matricule_response_series == matriculeJulien].mean()
+        # Compute the average for Students' rows
+        student_avg = response_series[matricule_series != matriculeJulien].mean()
+        # Compute the weighted average
+        weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
+        averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
+    # TODO: move the code above to utils to be reused when grading
+
     # Loop across all responses and append student's feedback
-    feedback = []
-    for responses in results['responses']:
-        logger.debug(responses)
-        if questionId in responses['answers'].keys():
-            feedback_individual = responses['answers'][questionId]['textAnswers']['answers'][0]['value']
-            # Check if feedback is from Julien (matricule='000000')
-            if responses['answers'][matriculeId]['textAnswers']['answers'][0]['value'] == '000000':
-                feedback_individual = "Commentaires de Julien Cohen-Adad: " + feedback_individual
-            feedback.append(feedback_individual)
+    # -------------------------------------------------------
+    # Use iloc to extract feedback for the specific question by its index
+    feedback_series = df.iloc[:, feedbackId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    matricule_series = df.iloc[:, matriculeId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    # Identify non-NaN indices in feedback_series
+    valid_indices = feedback_series.dropna().index
+    # Filter both series using valid indices
+    filtered_feedback_series = feedback_series.loc[valid_indices]
+    filtered_matricule_series = matricule_series.loc[valid_indices]
+    julien_feedback = []
+    other_feedback = []
+    for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
+        if matricule_value == matriculeJulien:
+            julien_feedback.append(feedback_value)
+        else:
+            other_feedback.append(feedback_value)
+    # Combine feedback: Julien's feedback at the top
+    feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
@@ -196,11 +229,13 @@ def main():
     # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
-    email_body = \
-        "Bonjour,\n\n" \
-        "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
-        "ci-dessous correspond au feedback d'un étudiant ou de l'enseignant.\n\n"
-    email_body += "- " + "\n- ".join(feedback)
+    email_body = (
+        f"Bonjour,\n\n"
+        "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6904/7904.\n\n"
+        "Voici tes notes par critère:\n\n" + "\n".join(averages_list) + "\n\n"
+        "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
+    )
+    # email_body += "- " + "\n- ".join(feedback)
     # Printout message in Terminal and ask for confirmation before sending
     logger.info('\nEmail to send:' + email_body)
     send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
