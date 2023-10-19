@@ -225,17 +225,22 @@ def main():
     # Loop across all responses and append student's feedback
     # -------------------------------------------------------
     # Use iloc to extract feedback for the specific question by its index
-    feedback_series = df.iloc[:, feedbackId]
-    # Remove nan (no evaluation)
-    feedback_series = feedback_series.dropna()
-    # Transform the series based on the 'matriculeId' condition
+    feedback_series = df.iloc[:, feedbackId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    matricule_series = df.iloc[:, matriculeId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    # Identify non-NaN indices in feedback_series
+    valid_indices = feedback_series.dropna().index
+    # Filter both series using valid indices
+    filtered_feedback_series = feedback_series.loc[valid_indices]
+    filtered_matricule_series = matricule_series.loc[valid_indices]
+    # Process the feedback
     def process_feedback(feedback_value, matricule_value):
         if matricule_value == matriculeJulien:
             return "Commentaires de Julien Cohen-Adad: " + feedback_value
-        return feedback_value['response']
-    matricule_series = df.iloc[:, matriculeId]
+        return feedback_value
     feedback = [process_feedback(feedback_value, matricule_value) 
-                for feedback_value, matricule_value in zip(feedback_series, matricule_series)]
+                for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series)]
+    # Rearrange feedback so "Commentaires de Julien..." are at the top
+    feedback = sorted(feedback, key=lambda x: 0 if x.startswith("Commentaires de Julien Cohen-Adad:") else 1)
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
