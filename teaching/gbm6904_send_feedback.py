@@ -152,41 +152,22 @@ def main():
 
     logger.info("Fetching the associated Google Form edit URL...")
     # TODO replace with function
-    # gform_id = ''
-    # for item in items:
-    #     # Fetch form details using the Forms API
-    #     form_details = forms_service.forms().get(formId=item['id']).execute()
-    #     # Extract the viewform URL
-    #     viewform_url = form_details['responderUri']
-    #     # Check if it corresponds to the target URL
-    #     if viewform_url == gform_url_expanded:
-    #         gform_id = item['id']
-    #         logger.info(f"Found matched gform ID: {gform_id}")
-    # if gform_id == '':
-    #     raise RuntimeError('Did not find matching edit URL.')
-    gform_id = "1Bfn5PwXRnk8sMNgV2I_n7-KBYB-FQ8EMuoEeLb6r1s0"  # DEBUG JULIEN
+    gform_id = ''
+    for item in items:
+        # Fetch form details using the Forms API
+        form_details = forms_service.forms().get(formId=item['id']).execute()
+        # Extract the viewform URL
+        viewform_url = form_details['responderUri']
+        # Check if it corresponds to the target URL
+        if viewform_url == gform_url_expanded:
+            gform_id = item['id']
+            logger.info(f"Found matched gform ID: {gform_id}")
+    if gform_id == '':
+        raise RuntimeError('Did not find matching edit URL.')
+    # gform_id = "1Bfn5PwXRnk8sMNgV2I_n7-KBYB-FQ8EMuoEeLb6r1s0"  # DEBUG JULIEN
 
     # Get form metadata
     result_metadata = forms_service.forms().get(formId=gform_id).execute()
-    # student = result_metadata['info']['title']
-
-    # # Get questionID of the feedback
-    # questionId = ''
-    # for item in result_metadata['items']:
-    #     if item['title'] == title_feedback:
-    #         questionId = item['questionItem']['question']['questionId']
-    # if questionId == '':
-    #     logger.error('questionId could not be retrieved. Check question title.')
-    #     raise RuntimeError
-
-    # # Get matriculeID of the evaluator
-    # matriculeId = ''
-    # for item in result_metadata['items']:
-    #     logger.debug(item['title'])
-    #     if item['title'] == 'Votre matricule étudiant :':
-    #         matriculeId = item['questionItem']['question']['questionId']
-    # if matriculeId == '':
-    #     logger.warning('Problem identifying matricule.')
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
