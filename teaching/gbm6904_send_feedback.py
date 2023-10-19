@@ -232,15 +232,15 @@ def main():
     # Filter both series using valid indices
     filtered_feedback_series = feedback_series.loc[valid_indices]
     filtered_matricule_series = matricule_series.loc[valid_indices]
-    # Process the feedback
-    def process_feedback(feedback_value, matricule_value):
+    julien_feedback = []
+    other_feedback = []
+    for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
         if matricule_value == matriculeJulien:
-            return "Commentaires de Julien Cohen-Adad: " + feedback_value
-        return feedback_value
-    feedback = [process_feedback(feedback_value, matricule_value) 
-                for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series)]
-    # Rearrange feedback so "Commentaires de Julien..." are at the top
-    feedback = sorted(feedback, key=lambda x: 0 if x.startswith("Commentaires de Julien Cohen-Adad:") else 1)
+            julien_feedback.append(feedback_value)
+        else:
+            other_feedback.append(feedback_value)
+    # Combine feedback: Julien's feedback at the top
+    feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
@@ -248,11 +248,13 @@ def main():
     # Email feedback to student
     email_to = fetch_email_address(matricule, path_csv)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
-    email_body = \
-        "Bonjour,\n\n" \
-        "Voici le feedback de la présentation que tu as donnée dans le cadre du cours GBM6904/7904. Chaque item " \
-        "ci-dessous correspond au feedback d'un étudiant ou de l'enseignant.\n\n"
-    email_body += "- " + "\n- ".join(feedback)
+    email_body = (
+        f"Bonjour,\n\n"
+        "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6904/7904.\n\n"
+        "Voici tes notes par critère:\n\n" + "\n".join(averages_list) + "\n\n"
+        "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
+    )
+    # email_body += "- " + "\n- ".join(feedback)
     # Printout message in Terminal and ask for confirmation before sending
     logger.info('\nEmail to send:' + email_body)
     send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
