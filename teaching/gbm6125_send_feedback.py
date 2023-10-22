@@ -50,7 +50,7 @@ FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 MATRICULE_JULIEN = '000000'
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
-PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/GBM6125-20233-01C.CSV"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
@@ -76,7 +76,7 @@ def main():
 
     # Get input parameters
     args = get_parameters()
-    matricule = args.matricule
+    matricule1 = args.matricule
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
@@ -117,7 +117,7 @@ def main():
     values = result.get('values', [])
     gform_url = None
     for row in values:
-        if row[GSHEET_COLUMN_MATRICULE] == matricule:
+        if row[GSHEET_COLUMN_MATRICULE] == matricule1:
             gform_url = row[GSHEET_COLUMN_URL]
             matricule2 = row[GSHEET_COLUMN_MATRICULE2]
             break
@@ -209,27 +209,25 @@ def main():
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
 
-    # Fetch the matricule of the other student
-
-
     # Email feedback to student
-    email_to = fetch_email_address(matricule, PATH_CSV)
-    email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
-    email_body = (
-        f"Bonjour,\n\n"
-        "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6904/7904.\n\n"
-        "Voici tes notes par critère:\n\n" + "\n".join(averages_list) + "\n\n"
-        # "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
-    )
-    # email_body += "- " + "\n- ".join(feedback)
-    # Printout message in Terminal and ask for confirmation before sending
-    logger.info(f"\nEmail to send:\n\n {email_body}")
-    send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
-    if send_prompt == "":
-        print("Message sent!")
-        gmail_send_message(email_to, email_subject, email_body, creds)
-    else:
-        print("Cancelled.")
+    for matricule in [matricule1, matricule2]:
+        email_to = fetch_email_address(matricule, PATH_CSV)
+        email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
+        email_body = (
+            f"Bonjour,\n\n"
+            "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n"
+            "Voici tes notes par critère:\n\n" + "\n".join(averages_list) + "\n\n"
+            # "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
+        )
+        # email_body += "- " + "\n- ".join(feedback)
+        # Printout message in Terminal and ask for confirmation before sending
+        logger.info(f"\nEmail to send (dest: {email_to}):\n\n {email_body}")
+        send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
+        if send_prompt == "":
+            print("Message sent!")
+            gmail_send_message(email_to, email_subject, email_body, creds)
+        else:
+            print("Cancelled.")
 
 
 if __name__ == "__main__":
