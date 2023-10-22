@@ -202,21 +202,20 @@ def main():
     # feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
-    logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
+    logger.info(f"\nNumber of responses: {len(results['responses'])}\n")
 
     # Email feedback to student
     for matricule in [matricule1, matricule2]:
         email_to = fetch_email_address(matricule, PATH_CSV)
-        email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
+        email_subject = '[GBM6125] Feedback sur ta présentation orale'
         email_body = (
             f"Bonjour,\n\n"
             "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n"
             "Voici tes notes par critère:\n\n" + "\n".join(averages_list) + "\n\n"
             # "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
         )
-        # email_body += "- " + "\n- ".join(feedback)
         # Printout message in Terminal and ask for confirmation before sending
-        logger.info(f"\nEmail to send (dest: {email_to}):\n\n {email_body}")
+        logger.warning(f"Email to send (dest: {email_to}):\n\n{email_body}")
         send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
         if send_prompt == "":
             print("Message sent!")
