@@ -36,7 +36,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from utils.utils import fetch_responses, expand_url
+from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address
 
 
 # Parameters
@@ -225,81 +225,6 @@ def main():
         gmail_send_message(email_to, email_subject, email_body, creds)
     else:
         print("Cancelled.")
-
-
-def fetch_email_address(matricule: str, path_csv: str) -> str:
-    """
-    Find email address of student based on their matricule, using a CSV file that is provided by the university.
-    This function assumes the following CSV structure:
-        matricule | Last name | First name | email
-
-    :param matricule:
-    :param path_csv: CSV file that contains matricule and email address of students. Provided by the university.
-    :return: email_addr: Email address of student
-    """
-    # encoding='latin-1' is required because of non utf-8 characters in the CSV file (accents, etc.)
-    with open(path_csv, newline='', encoding='latin-1') as csvfile:
-        reader = csv.reader(csvfile, delimiter=';')
-        for row in reader:
-            if row[0] == matricule:
-                return row[3]
-        # If email was not found, raise error
-        logger.error('Did not found email from the CSV file with matricule: {}'.format(matricule))
-        raise RuntimeError
-
-
-def gmail_send_message(email_to: str, subject: str, email_body: str, creds):
-    """Create and send an email message
-    Print the returned  message id
-    Returns: Message object, including message id
-
-    Load pre-authorized user credentials from the environment.
-    TODO(developer) - See https://developers.google.com/identity
-    for guides on implementing OAuth2 for the application.
-    :param email_to: Recipient of the email
-    :param subject: Subject of the email
-    :param email_body: Body of the email
-    :return:
-    """
-    # TODO: do the authentication with the code above (to avoid doing it twice)
-    # SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
-    # store = file.Storage('token.json')
-    # creds = None
-    # if not creds or creds.invalid:
-    #     flow = client.flow_from_clientsecrets('client_secrets.json', SCOPES)
-    #     # tools is using args, therefore the workaround below creates a dummy parser with the mandatory flags
-    #     # https://stackoverflow.com/questions/46737536/unrecognized-arguments-using-oauth2-and-google-apis
-    #     parser = argparse.ArgumentParser(
-    #         description=__doc__,
-    #         formatter_class=argparse.RawDescriptionHelpFormatter,
-    #         parents=[tools.argparser])
-    #     flags = parser.parse_args([])
-    #     creds = tools.run_flow(flow, store, flags=flags)
-
-    try:
-        forms_service = build('gmail', 'v1', credentials=creds)
-        message = EmailMessage()
-
-        message.set_content(email_body)
-        # TODO: fetch email_to automatically
-        message['To'] = email_to
-        message['From'] = EMAIL_FROM
-        message['Subject'] = subject
-
-        # encoded message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-
-        create_message = {
-            'raw': encoded_message
-        }
-        # pylint: disable=E1101
-        send_message = (forms_service.users().messages().send
-                        (userId="me", body=create_message).execute())
-        print(F'Message Id: {send_message["id"]}')
-    except HttpError as error:
-        print(F'An error occurred: {error}')
-        send_message = None
-    return send_message
 
 
 if __name__ == "__main__":
