@@ -1,5 +1,6 @@
 # Utility file for teaching library
 
+import base64
 import csv
 import logging
 import pandas as pd
@@ -7,7 +8,7 @@ import pandas as pd
 from requests import get
 from email.message import EmailMessage
 from googleapiclient.errors import HttpError
-
+from googleapiclient.discovery import build
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
