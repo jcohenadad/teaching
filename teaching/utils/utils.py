@@ -1,9 +1,12 @@
 # Utility file for teaching library
 
+import csv
 import logging
 import pandas as pd
 
 from requests import get
+from email.message import EmailMessage
+from googleapiclient.errors import HttpError
 
 
 # Initialize colored logging

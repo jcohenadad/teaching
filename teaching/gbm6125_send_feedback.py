@@ -18,14 +18,11 @@
 # Author: Julien Cohen-Adad
 
 import argparse
-import csv
 import logging
-import base64
 import numpy as np
 import os
 import pandas as pd
 import pickle
-from email.message import EmailMessage
 
 import coloredlogs
 
