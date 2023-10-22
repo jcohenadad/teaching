@@ -9,6 +9,21 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
+
+def expand_url(short_url):
+    """Expand URL from short URL
+
+    Args:
+        short_url (str): Short URL
+
+    Returns:
+        str: Long URL
+    """
+    # Follow the shortened URL to its destination
+    response = get(short_url, allow_redirects=True, timeout=10)
+    return response.url
+
+
 def fetch_responses(results, result_metadata):
 
     # Get matriculeID of the evaluator

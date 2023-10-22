@@ -36,12 +36,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from utils.utils import fetch_responses
+from utils.utils import fetch_responses, expand_url
 
 
 # Parameters
 FOLDER_ID = '17gfs6G0cSuKFG0UC3uFoEse6xC4hISGA'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '1ehztiWcQ8sIfktejWvxrHMYZpeDamqcrrWboy-Ha2oA'  # Google sheet that lists the matricules and URLs to the gforms
+GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule (starts at 0)
+GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 MATRICULE_JULIEN = '000000'
@@ -63,25 +65,6 @@ def get_parameters():
                         help="Student matricule. Used to fetch the email address.")
     args = parser.parse_args()
     return args
-
-
-def expand_url(short_url):
-    """Expand URL from short URL
-
-    Args:
-        short_url (str): Short URL
-
-    Returns:
-        str: Long URL
-    """
-    # Follow the shortened URL to its destination
-    response = get(short_url, allow_redirects=True, timeout=10)
-    return response.url
-
-    # Compute average grade
-    gradeStudentAvg = np.mean(gradeStudent)
-    gradeAvg = (gradeProf + gradeStudentAvg) / 2
-    logger.info(f"grade: {gradeAvg} (StudentAvg: {gradeStudentAvg}, Prof: {gradeProf})")
 
 
 def main():
@@ -128,15 +111,13 @@ def main():
     sheets_service = build('sheets', 'v4', credentials=creds)
 
     # Find the gform URL from the Matricule on the gsheet
-    INPUT_COLUMN_INDEX = 1  # column corresponding to the matricule (starts at 0)
-    OUTPUT_COLUMN_INDEX = 5  # column corresponding to the gform URL
     sheet = sheets_service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range='Sheet1').execute()
     values = result.get('values', [])
     gform_url = None
     for row in values:
-        if row[INPUT_COLUMN_INDEX] == matricule:
-            gform_url = row[OUTPUT_COLUMN_INDEX]
+        if row[GSHEET_COLUMN_MATRICULE] == matricule:
+            gform_url = row[GSHEET_COLUMN_URL]
             break
     if gform_url is not None:
         logger.info(f"Found gform URL: {gform_url}")

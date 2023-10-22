@@ -36,24 +36,24 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from utils.utils import fetch_responses
+from utils.utils import fetch_responses, expand_url
 
 
 # Parameters
-folder_id = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
+FOLDER_ID = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
-matriculeId = 0  # ID of the question corresponding to the matricule
-matriculeJulien = '000000'
-feedbackId = 11  # ID of the question corresponding to the feedback
+MATRICULE_ID = 0  # ID of the question corresponding to the matricule
+MATRICULE_JULIEN = '000000'
+FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
-email_from = "jcohen@polymtl.ca"
-path_csv = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
-logging_level = 'INFO'  # 'DEBUG', 'INFO'
+EMAIL_FROM = "jcohen@polymtl.ca"
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
+LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
 logger = logging.getLogger(__name__)
-coloredlogs.install(fmt='%(message)s', level=logging_level, logger=logger)
+coloredlogs.install(fmt='%(message)s', level=LOGGING_LEVEL, logger=logger)
 
 
 def get_parameters():
@@ -63,25 +63,6 @@ def get_parameters():
                         help="Student matricule. Used to fetch the email address.")
     args = parser.parse_args()
     return args
-
-
-def expand_url(short_url):
-    """Expand URL from short URL
-
-    Args:
-        short_url (str): Short URL
-
-    Returns:
-        str: Long URL
-    """
-    # Follow the shortened URL to its destination
-    response = get(short_url, allow_redirects=True, timeout=10)
-    return response.url
-
-    # Compute average grade
-    gradeStudentAvg = np.mean(gradeStudent)
-    gradeAvg = (gradeProf + gradeStudentAvg) / 2
-    logger.info(f"grade: {gradeAvg} (StudentAvg: {gradeStudentAvg}, Prof: {gradeProf})")
 
 
 def main():
@@ -146,7 +127,7 @@ def main():
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
 
-    results = drive_service.files().list(q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.form'",
+    results = drive_service.files().list(q=f"'{FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.form'",
                                         fields="files(id, name)").execute()
     items = results.get('files', [])
 
@@ -191,13 +172,13 @@ def main():
         if max_score is None:
             raise ValueError(f"Max score not found for question: '{question}'")
         # Fetch all matricule rows
-        matricule_series = df.iloc[:, matriculeId]  # Assuming you have a matricule_column_name defined above
+        matricule_series = df.iloc[:, MATRICULE_ID]  # Assuming you have a matricule_column_name defined above
         # Extracting just the response value from matricule_series
         matricule_response_series = matricule_series.apply(lambda x: x['response'] if isinstance(x, dict) else None)
         # Compute the average for Julien's rows
-        julien_avg = response_series[matricule_response_series == matriculeJulien].mean()
+        julien_avg = response_series[matricule_response_series == MATRICULE_JULIEN].mean()
         # Compute the average for Students' rows
-        student_avg = response_series[matricule_series != matriculeJulien].mean()
+        student_avg = response_series[matricule_series != MATRICULE_JULIEN].mean()
         # Compute the weighted average
         weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
         averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
@@ -206,8 +187,8 @@ def main():
     # Loop across all responses and append student's feedback
     # -------------------------------------------------------
     # Use iloc to extract feedback for the specific question by its index
-    feedback_series = df.iloc[:, feedbackId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
-    matricule_series = df.iloc[:, matriculeId].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    feedback_series = df.iloc[:, FEEDBACK_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    matricule_series = df.iloc[:, MATRICULE_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
     # Identify non-NaN indices in feedback_series
     valid_indices = feedback_series.dropna().index
     # Filter both series using valid indices
@@ -216,7 +197,7 @@ def main():
     julien_feedback = []
     other_feedback = []
     for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
-        if matricule_value == matriculeJulien:
+        if matricule_value == MATRICULE_JULIEN:
             julien_feedback.append(feedback_value)
         else:
             other_feedback.append(feedback_value)
@@ -227,7 +208,7 @@ def main():
     logger.warning(f"\nNumber of responses: {len(results['responses'])}\n")
 
     # Email feedback to student
-    email_to = fetch_email_address(matricule, path_csv)
+    email_to = fetch_email_address(matricule, PATH_CSV)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
     email_body = (
         f"Bonjour,\n\n"
@@ -302,7 +283,7 @@ def gmail_send_message(email_to: str, subject: str, email_body: str, creds):
         message.set_content(email_body)
         # TODO: fetch email_to automatically
         message['To'] = email_to
-        message['From'] = email_from
+        message['From'] = EMAIL_FROM
         message['Subject'] = subject
 
         # encoded message
