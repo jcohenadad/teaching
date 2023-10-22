@@ -4,10 +4,13 @@
 #
 # How to use:
 # - Open the gsheet with the list of presentations
-# - Open the URL of the gform for the student to send the feedback to
-# - On the gform, click "edit", and then copy the new URL of the gform.
-# - Run this function using that URL
+# - Copy the matricule of the first presenting student
+# - Run this function: 
+#   > python teaching/gbm6125_send_feedback.py <MATRICULE>
 #
+# For batch run across all students, run:
+# > for matricule in 1950287 1032524 ... 1883002; do python teaching/gbm6125_send_feedback.py $matricule; done
+# 
 # The file "client_secrets.json" need to be present in the working directory.
 #
 # Useful documentation
