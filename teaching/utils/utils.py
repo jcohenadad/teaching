@@ -3,6 +3,8 @@
 import logging
 import pandas as pd
 
+from requests import get
+
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
