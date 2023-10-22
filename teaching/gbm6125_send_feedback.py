@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 #
-# For course GBM6904. Fetch Google Form (providing ID of the form), gather and email feedback to the student.
+# For course GBM6125. Fetch Google Form (providing ID of the form), gather and email feedback to the student.
 #
 # How to use:
 # - Open the gsheet with the list of presentations
 # - Copy the matricule of the first presenting student
 # - Run this function: 
-#   > python teaching/gbm6904_send_feedback.py <MATRICULE>
+#   > python teaching/gbm6125_send_feedback.py <MATRICULE>
 #
+# For batch run across all students, run:
+# > for matricule in 1950287 1032524 ... 1883002; do python teaching/gbm6125_send_feedback.py $matricule; done
+# 
 # The file "client_secrets.json" need to be present in the working directory.
 #
 # Useful documentation
@@ -35,14 +38,17 @@ from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_e
 
 
 # Parameters
-FOLDER_ID = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
-SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
+FOLDER_ID = '17gfs6G0cSuKFG0UC3uFoEse6xC4hISGA'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '1ehztiWcQ8sIfktejWvxrHMYZpeDamqcrrWboy-Ha2oA'  # Google sheet that lists the matricules and URLs to the gforms
+GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
+GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
+GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
-MATRICULE_JULIEN = '000000'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
+MATRICULE_JULIEN = '000000'
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
-PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2023/GBM6904-7904-20233-01C.csv"
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/GBM6125-20233-01C.CSV"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
@@ -68,7 +74,7 @@ def main():
 
     # Get input parameters
     args = get_parameters()
-    matricule = args.matricule
+    matricule1 = args.matricule
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
@@ -104,15 +110,14 @@ def main():
     sheets_service = build('sheets', 'v4', credentials=creds)
 
     # Find the gform URL from the Matricule on the gsheet
-    INPUT_COLUMN_INDEX = 1  # column corresponding to the matricule (starts at 0)
-    OUTPUT_COLUMN_INDEX = 5  # column corresponding to the gform URL
     sheet = sheets_service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range='Sheet1').execute()
     values = result.get('values', [])
     gform_url = None
     for row in values:
-        if row[INPUT_COLUMN_INDEX] == matricule:
-            gform_url = row[OUTPUT_COLUMN_INDEX]
+        if row[GSHEET_COLUMN_MATRICULE] == matricule1:
+            gform_url = row[GSHEET_COLUMN_URL]
+            matricule2 = row[GSHEET_COLUMN_MATRICULE2]
             break
     if gform_url is not None:
         logger.info(f"Found gform URL: {gform_url}")
@@ -153,7 +158,7 @@ def main():
     # Compute average grade for each response
     # ---------------------------------------
     # Extract columns corresponding to graded questions
-    subset_df = df[ordered_columns[1:10]]
+    subset_df = df[ordered_columns[1:6]]
     averages_list = []
     # Print out the questions and their averages
     for question in subset_df.columns:
@@ -179,47 +184,48 @@ def main():
         averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
     # TODO: move the code above to utils to be reused when grading
 
-    # Loop across all responses and append student's feedback
-    # -------------------------------------------------------
-    # Use iloc to extract feedback for the specific question by its index
-    feedback_series = df.iloc[:, FEEDBACK_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
-    matricule_series = df.iloc[:, MATRICULE_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
-    # Identify non-NaN indices in feedback_series
-    valid_indices = feedback_series.dropna().index
-    # Filter both series using valid indices
-    filtered_feedback_series = feedback_series.loc[valid_indices]
-    filtered_matricule_series = matricule_series.loc[valid_indices]
-    julien_feedback = []
-    other_feedback = []
-    for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
-        if matricule_value == MATRICULE_JULIEN:
-            julien_feedback.append(feedback_value)
-        else:
-            other_feedback.append(feedback_value)
-    # Combine feedback: Julien's feedback at the top
-    feedback = julien_feedback + other_feedback
+    # # Loop across all responses and append student's feedback
+    # # -------------------------------------------------------
+    # # Use iloc to extract feedback for the specific question by its index
+    # feedback_series = df.iloc[:, FEEDBACK_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    # matricule_series = df.iloc[:, MATRICULE_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    # # Identify non-NaN indices in feedback_series
+    # valid_indices = feedback_series.dropna().index
+    # # Filter both series using valid indices
+    # filtered_feedback_series = feedback_series.loc[valid_indices]
+    # filtered_matricule_series = matricule_series.loc[valid_indices]
+    # julien_feedback = []
+    # other_feedback = []
+    # for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
+    #     if matricule_value == MATRICULE_JULIEN:
+    #         julien_feedback.append(feedback_value)
+    #     else:
+    #         other_feedback.append(feedback_value)
+    # # Combine feedback: Julien's feedback at the top
+    # feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.info(f"\nNumber of responses: {len(results['responses'])}\n")
 
     # Email feedback to student
-    email_to = fetch_email_address(matricule, PATH_CSV)
-    email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
-    email_body = (
-        f"Bonjour,\n\n"
-        "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6904/7904.\n\n"
-        "Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n" + "\n".join(averages_list) + "\n\n"
-        "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
-        "\n\nJulien Cohen-Adad"
-    )
-    # Printout message in Terminal and ask for confirmation before sending
-    logger.warning(f"Email to send (dest: {email_to}):\n\n{email_body}")
-    send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
-    if send_prompt == "":
-        print("Message sent!")
-        gmail_send_message(EMAIL_FROM, email_to, email_subject, email_body, creds)
-    else:
-        print("Cancelled.")
+    for matricule in [matricule1, matricule2]:
+        email_to = fetch_email_address(matricule, PATH_CSV)
+        email_subject = '[GBM6125] Feedback sur ta présentation orale'
+        email_body = (
+            f"Bonjour,\n\n"
+            "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n"
+            "Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n" + "\n".join(averages_list) + "\n\n"
+            # "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
+            "\n\nJulien Cohen-Adad"
+        )
+        # Printout message in Terminal and ask for confirmation before sending
+        logger.warning(f"Email to send (dest: {email_to}):\n\n{email_body}")
+        send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
+        if send_prompt == "":
+            print("Message sent!")
+            gmail_send_message(EMAIL_FROM, email_to, email_subject, email_body, creds)
+        else:
+            print("Cancelled.")
 
 
 if __name__ == "__main__":
