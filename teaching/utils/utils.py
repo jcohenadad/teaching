@@ -106,7 +106,7 @@ def fetch_email_address(matricule: str, path_csv: str) -> str:
         raise RuntimeError
 
 
-def gmail_send_message(email_to: str, subject: str, email_body: str, creds):
+def gmail_send_message(email_from: str, email_to: str, subject: str, email_body: str, creds):
     """Create and send an email message
     Print the returned  message id
     Returns: Message object, including message id
@@ -141,7 +141,7 @@ def gmail_send_message(email_to: str, subject: str, email_body: str, creds):
         message.set_content(email_body)
         # TODO: fetch email_to automatically
         message['To'] = email_to
-        message['From'] = EMAIL_FROM
+        message['From'] = email_from
         message['Subject'] = subject
 
         # encoded message

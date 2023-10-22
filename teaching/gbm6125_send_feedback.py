@@ -219,7 +219,7 @@ def main():
         send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
         if send_prompt == "":
             print("Message sent!")
-            gmail_send_message(email_to, email_subject, email_body, creds)
+            gmail_send_message(EMAIL_FROM, email_to, email_subject, email_body, creds)
         else:
             print("Cancelled.")
 
