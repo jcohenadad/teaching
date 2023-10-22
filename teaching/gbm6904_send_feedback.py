@@ -218,7 +218,7 @@ def main():
     )
     # email_body += "- " + "\n- ".join(feedback)
     # Printout message in Terminal and ask for confirmation before sending
-    logger.info('\nEmail to send:' + email_body)
+    logger.info(f"\nEmail to send:\n\n {email_body}")
     send_prompt = input("Press [ENTER] to send, or type any text and then press [ENTER] to cancel.")
     if send_prompt == "":
         print("Message sent!")
