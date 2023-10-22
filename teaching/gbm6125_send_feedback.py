@@ -27,11 +27,9 @@ import pickle
 import coloredlogs
 
 from requests import get
-from oauth2client import client, file, tools
 from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address
 
