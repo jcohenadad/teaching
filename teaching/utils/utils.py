@@ -17,8 +17,19 @@ logger = logging.getLogger(__name__)
 
 
 def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien):
-    """Compute the weighted average grade for each response."""
+    """Compute the weighted average grade for each response.
 
+    Args:
+        df (_type_): _description_
+        ordered_columns (_type_): _description_
+        col_start (_type_): _description_
+        col_end (_type_): _description_
+        matricule_id (_type_): _description_
+        matricule_julien (_type_): _description_
+
+    Returns:
+        _type_: List of strings with the weighted average for each question
+    """    """"""
     # Extract columns corresponding to graded questions
     subset_df = df[ordered_columns[col_start:col_end]]
     averages_list = []
