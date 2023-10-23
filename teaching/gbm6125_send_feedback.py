@@ -215,8 +215,7 @@ def main():
             f"Bonjour,\n\n"
             "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n"
             "Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n" + "\n".join(averages_list) + "\n\n"
-            "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
-            "\n\nJulien Cohen-Adad"
+            "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback) + "\n\nJulien Cohen-Adad"
         )
         # Printout message in Terminal and ask for confirmation before sending
         logger.warning(f"Email to send (dest: {email_to}):\n\n{email_body}")

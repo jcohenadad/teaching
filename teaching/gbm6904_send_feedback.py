@@ -38,7 +38,7 @@ from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_e
 FOLDER_ID = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
-MATRICULE_JULIEN = '000000'
+MATRICULE_JULIEN = '0000001'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
@@ -209,8 +209,7 @@ def main():
         f"Bonjour,\n\n"
         "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6904/7904.\n\n"
         "Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n" + "\n".join(averages_list) + "\n\n"
-        "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
-        "\n\nJulien Cohen-Adad"
+        "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback) + "\n\nJulien Cohen-Adad"
     )
     # Printout message in Terminal and ask for confirmation before sending
     logger.warning(f"Email to send (dest: {email_to}):\n\n{email_body}")
