@@ -3,6 +3,7 @@
 import base64
 import csv
 import logging
+import numpy as np
 import pandas as pd
 
 from requests import get
@@ -14,6 +15,46 @@ from googleapiclient.discovery import build
 # Note: coloredlogs.install() replaces logging.BasicConfig()
 logger = logging.getLogger(__name__)
 
+
+def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien):
+    """Compute the weighted average grade for each response."""
+
+    # Extract columns corresponding to graded questions
+    subset_df = df[ordered_columns[col_start:col_end]]
+    averages_list = []
+
+    # Print out the questions and their averages
+    for question in subset_df.columns:
+        # Extracting the response and max score values from the nested dictionaries
+        response_series = df[question].apply(lambda x: float(x['response']) if pd.notnull(x) else np.nan).dropna()
+        max_score_series = df[question].apply(lambda x: x['max_score'] if pd.notnull(x) else np.nan).dropna()
+
+        # Since all max scores for a particular question should be the same, 
+        # just fetch the first value for the max score of this question
+        max_score = max_score_series.iloc[0] if not max_score_series.empty else None
+
+        # If we couldn't find a max score, default to 5 (or you can handle this differently)
+        if max_score is None:
+            raise ValueError(f"Max score not found for question: '{question}'")
+
+        # Fetch all matricule rows
+        matricule_series = df.iloc[:, matricule_id]
+
+        # Extracting just the response value from matricule_series
+        matricule_response_series = matricule_series.apply(lambda x: x['response'] if isinstance(x, dict) else None)
+
+        # Compute the average for Julien's rows
+        julien_avg = response_series[matricule_response_series == matricule_julien].mean()
+
+        # Compute the average for Students' rows
+        student_avg = response_series[matricule_series != matricule_julien].mean()
+
+        # Compute the weighted average
+        weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
+
+        averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
+
+    return averages_list
 
 
 def expand_url(short_url):

@@ -31,14 +31,14 @@ from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address
+from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
 
 
 # Parameters
 FOLDER_ID = '1rj6GfMvK6_cirTHPYpExSPJtZHne-gM3'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '11vpuK2iiuIpUscjfI-Ork9fg0BzU3OFzuG9_-aweEDY'  # Google sheet that lists the matricules and URLs to the gforms
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
-MATRICULE_JULIEN = '0000001'
+MATRICULE_JULIEN = '000000'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
@@ -147,10 +147,11 @@ def main():
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
-
     df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Compute average grade for each response
+    averages_list = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN)
+
     # ---------------------------------------
     # Extract columns corresponding to graded questions
     subset_df = df[ordered_columns[1:10]]

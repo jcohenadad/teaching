@@ -34,7 +34,7 @@ from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address
+from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
 
 
 # Parameters
@@ -152,37 +152,10 @@ def main():
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
-
     df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Compute average grade for each response
-    # ---------------------------------------
-    # Extract columns corresponding to graded questions
-    subset_df = df[ordered_columns[1:6]]
-    averages_list = []
-    # Print out the questions and their averages
-    for question in subset_df.columns:
-        # Extracting the response and max score values from the nested dictionaries
-        response_series = df[question].apply(lambda x: float(x['response']) if pd.notnull(x) else np.nan).dropna()
-        max_score_series = df[question].apply(lambda x: x['max_score'] if pd.notnull(x) else np.nan).dropna()
-        # Since all max scores for a particular question should be the same, 
-        # just fetch the first value for the max score of this question
-        max_score = max_score_series.iloc[0] if not max_score_series.empty else None
-        # If we couldn't find a max score, default to 5 (or you can handle this differently)
-        if max_score is None:
-            raise ValueError(f"Max score not found for question: '{question}'")
-        # Fetch all matricule rows
-        matricule_series = df.iloc[:, MATRICULE_ID]  # Assuming you have a matricule_column_name defined above
-        # Extracting just the response value from matricule_series
-        matricule_response_series = matricule_series.apply(lambda x: x['response'] if isinstance(x, dict) else None)
-        # Compute the average for Julien's rows
-        julien_avg = response_series[matricule_response_series == MATRICULE_JULIEN].mean()
-        # Compute the average for Students' rows
-        student_avg = response_series[matricule_series != MATRICULE_JULIEN].mean()
-        # Compute the weighted average
-        weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
-        averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
-    # TODO: move the code above to utils to be reused when grading
+    averages_list = compute_weighted_averages(df, ordered_columns, 1, 6, MATRICULE_ID, MATRICULE_JULIEN)
 
     # Loop across all responses and append student's feedback
     # -------------------------------------------------------
