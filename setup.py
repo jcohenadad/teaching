@@ -17,7 +17,8 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'send-feedback = teaching.scripts.gbm6904_send_feedback:main',
+            'gbm6904_send_feedback = teaching.gbm6904_send_feedback:main',
+            'gbm6125_send_feedback = teaching.gbm6125_send_feedback:main',
             ]
         }
     )
