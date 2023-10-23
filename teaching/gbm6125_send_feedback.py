@@ -86,8 +86,9 @@ def main():
     creds = None
 
     # Check if the token.pickle file exists. If so, load it
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    token_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'token.pickle')
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
             creds = pickle.load(token)
 
     # If there are no (valid) credentials available, prompt the user to log in.
