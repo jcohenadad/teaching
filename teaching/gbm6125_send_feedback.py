@@ -184,25 +184,25 @@ def main():
         averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
     # TODO: move the code above to utils to be reused when grading
 
-    # # Loop across all responses and append student's feedback
-    # # -------------------------------------------------------
-    # # Use iloc to extract feedback for the specific question by its index
-    # feedback_series = df.iloc[:, FEEDBACK_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
-    # matricule_series = df.iloc[:, MATRICULE_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
-    # # Identify non-NaN indices in feedback_series
-    # valid_indices = feedback_series.dropna().index
-    # # Filter both series using valid indices
-    # filtered_feedback_series = feedback_series.loc[valid_indices]
-    # filtered_matricule_series = matricule_series.loc[valid_indices]
-    # julien_feedback = []
-    # other_feedback = []
-    # for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
-    #     if matricule_value == MATRICULE_JULIEN:
-    #         julien_feedback.append(feedback_value)
-    #     else:
-    #         other_feedback.append(feedback_value)
-    # # Combine feedback: Julien's feedback at the top
-    # feedback = julien_feedback + other_feedback
+    # Loop across all responses and append student's feedback
+    # -------------------------------------------------------
+    # Use iloc to extract feedback for the specific question by its index
+    feedback_series = df.iloc[:, FEEDBACK_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    matricule_series = df.iloc[:, MATRICULE_ID].apply(lambda x: x['response'] if isinstance(x, dict) and 'response' in x else None)
+    # Identify non-NaN indices in feedback_series
+    valid_indices = feedback_series.dropna().index
+    # Filter both series using valid indices
+    filtered_feedback_series = feedback_series.loc[valid_indices]
+    filtered_matricule_series = matricule_series.loc[valid_indices]
+    julien_feedback = []
+    other_feedback = []
+    for feedback_value, matricule_value in zip(filtered_feedback_series, filtered_matricule_series):
+        if matricule_value == MATRICULE_JULIEN:
+            julien_feedback.append(feedback_value)
+        else:
+            other_feedback.append(feedback_value)
+    # Combine feedback: Julien's feedback at the top
+    feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
     logger.info(f"\nNumber of responses: {len(results['responses'])}\n")
@@ -215,7 +215,7 @@ def main():
             f"Bonjour,\n\n"
             "Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n"
             "Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n" + "\n".join(averages_list) + "\n\n"
-            # "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
+            "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + "- " + "\n- ".join(feedback)
             "\n\nJulien Cohen-Adad"
         )
         # Printout message in Terminal and ask for confirmation before sending
