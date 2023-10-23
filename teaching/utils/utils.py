@@ -45,9 +45,13 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
 
         # Compute the average for Julien's rows
         julien_avg = response_series[matricule_response_series == matricule_julien].mean()
+        if np.isnan(julien_avg):
+            raise ValueError("julien_avg is NaN")
 
         # Compute the average for Students' rows
         student_avg = response_series[matricule_series != matricule_julien].mean()
+        if np.isnan(student_avg):
+            raise ValueError("student_avg is NaN")
 
         # Compute the weighted average
         weighted_avg = 0.5 * julien_avg + 0.5 * student_avg
