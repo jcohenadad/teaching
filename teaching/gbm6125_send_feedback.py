@@ -34,7 +34,7 @@ from google.auth.transport import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
+from .utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
 
 
 # Parameters
