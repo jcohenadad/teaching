@@ -60,8 +60,10 @@ coloredlogs.install(fmt='%(message)s', level=LOGGING_LEVEL, logger=logger)
 def get_parameters():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=
     "Fetch Google Form (providing ID of the form), gather and email feedback to the student.\n\n"
-    "For batch run across all students, run:\n"
-    "> for matricule in 1950287 1032524 ... 1883002; do gbm6125_send_feedback $matricule; done"
+    "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
+    "> '=JOIN(" ", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
+    "Then, in the Terminal, run:\n"
+    "> for matricule in <LIST_MATRICULE>; do gbm6125_send_feedback $matricule; done"
     )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
