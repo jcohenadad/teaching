@@ -58,8 +58,11 @@ coloredlogs.install(fmt='%(message)s', level=LOGGING_LEVEL, logger=logger)
 
 
 def get_parameters():
-    parser = argparse.ArgumentParser(description="""
-    Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=
+    "Fetch Google Form (providing ID of the form), gather and email feedback to the student.\n\n"
+    "For batch run across all students, run:\n"
+    "> for matricule in 1950287 1032524 ... 1883002; do gbm6125_send_feedback $matricule; done"
+    )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
     args = parser.parse_args()
