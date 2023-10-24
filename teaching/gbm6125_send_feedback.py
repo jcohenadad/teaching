@@ -44,7 +44,7 @@ GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
-FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
+FEEDBACK_ID = 6  # ID of the question corresponding to the feedback
 MATRICULE_JULIEN = '000000'
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
