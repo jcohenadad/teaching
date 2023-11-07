@@ -155,7 +155,7 @@ def main():
 
     # ---------------------------------------
     # Extract columns corresponding to graded questions
-    subset_df = df[ordered_columns[1:10]]
+    subset_df = df[ordered_columns[1:11]]
     averages_list = []
     # Print out the questions and their averages
     for question in subset_df.columns:
