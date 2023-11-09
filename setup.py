@@ -19,6 +19,7 @@ setup(
         'console_scripts': [
             'gbm6904_send_feedback = teaching.gbm6904_send_feedback:main',
             'gbm6125_send_feedback = teaching.gbm6125_send_feedback:main',
+            'find_fill_excel = teaching.find_fill_excel:main',
             ]
         }
     )
