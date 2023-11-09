@@ -119,9 +119,9 @@ def main():
         else:
             # Force it to be a string for subsequent comparison
             id = str(id)
-        logger.info(f"id: {id}")
         # Read value from source file
         val = ws1.cell(row=i, column=col_val_src).value
+        logger.info(f"Source: matricule={id}, value={val}")
         # Find index from dest file
         found = False
         for i_row in range(1, ws2.max_row + 1):
