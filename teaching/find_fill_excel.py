@@ -36,7 +36,7 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
                         help='Source column of the student ID (matricule), starting at 1')
 
     parser.add_argument('--col_val_src', type=int, default=7,
-                        help='Source column of the student grade, starting at 1')
+                        help='Source column of the student grade, starting at 1. For GBM6125: 9.')
 
     parser.add_argument('--row_start_src', type=int, default=1,
                         help='Starting row in source file, starting at 1')
@@ -93,6 +93,7 @@ def main():
     col_val_src = args.col_val_src
     row_start_src = args.row_start_src
     col_id_dest = args.col_id_dest
+    col_val_dest = args.col_val_dest
 
     # Opening source Excel file
     wb1 = xl.load_workbook(fname_source, read_only=True, data_only=True)
