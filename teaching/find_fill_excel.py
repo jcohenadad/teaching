@@ -3,9 +3,9 @@
 This script finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL file. The matching is done
 on a column specified in this script (eg: the 'matricule' of a student).
 
-Export files:
-- GBM8378: https://ele.examen.polymtl.ca/grade/export/ods/index.php?id=1412
-- GBM6904: https://moodle.polymtl.ca/grade/export/xls/index.php?id=415
+How to use:
+- Export files as Excel from Moodle Exam.
+- Get the Quotes template from the department. See email "subject: Rapport quotes"
 """
 
 import argparse
