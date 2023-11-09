@@ -15,7 +15,7 @@ from loguru import logger
 
 
 logger.remove()
-logger.add(sys.stderr, level="DEBUG")
+logger.add(sys.stderr, level="INFO")
 
 def get_parameters():
     parser = argparse.ArgumentParser(description="""
@@ -28,9 +28,6 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
 
     parser.add_argument('--fname_dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
-
-    parser.add_argument('--fname_out', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205_modif.xlsx",
-                        help='Name of the output file')
 
     parser.add_argument('--col_id_src', type=int, default=3,
                         help='Source column of the student ID (matricule), starting at 1')
@@ -88,7 +85,6 @@ def main():
     args = get_parameters()
     fname_source = args.fname_source
     fname_dest = args.fname_dest
-    fname_out = args.fname_out
     col_id_src = args.col_id_src
     col_val_src = args.col_val_src
     row_start_src = args.row_start_src
@@ -125,22 +121,20 @@ def main():
         # Find index from dest file
         found = False
         for i_row in range(1, ws2.max_row + 1):
-            for i_col in range(1, ws2.max_column + 1):
-                cell = ws2.cell(i_row, i_col).value
-                # For it to be a string for the comparison below
-                cell = str(cell)
-                logger.debug(f"id: {id} | Cell ({i_row}, {i_col}): {cell}")
-                if cell == id:
-                    found = True
-                    # Assign value in destination cell
-                    ws2.cell(i_row, col_val_dest).value = val
-                    logger.info(f"Found matching cell! 🎉")
-                    break
+            # Fetch matricule on destination file
+            cell = str(ws2.cell(i_row, col_id_dest).value)
+            logger.debug(f"Destination: i_row={i_row}, cell={cell}")
+            if cell == id:
+                found = True
+                # Assign value in destination cell
+                ws2.cell(i_row, col_val_dest).value = val
+                logger.info(f"Found matching cell! 🎉")
+                break
         if not found:
             logger.error("Not found :-(")
 
     # saving the destination Excel file
-    wb2.save(fname_out)
+    wb2.save(fname_dest)
 
     logger.info("Job done! 🎉")
 
