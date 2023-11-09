@@ -32,8 +32,8 @@
             "justMyCode": true,
             "args": ["--fname_source", "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/GBM6125-Examen-2023-notes.xlsx", 
                      "--fname_dest", "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/Cotes_GBM6125_20233_01_Cours_EF_1_20230109.xlsx",
-                     "--col_val_src", 9,
-                     "--col_val_dest", 4]
+                     "--col_val_src", "9",
+                     "--col_val_dest", "4"]
         }
     ]
 }
