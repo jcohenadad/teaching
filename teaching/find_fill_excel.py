@@ -4,8 +4,16 @@ This script finds the value of a 'source' EXCEL file and insert it in a 'destina
 on a column specified in this script (eg: the 'matricule' of a student).
 
 How to use:
-- Export files as Excel from Moodle Exam.
-- Get the Quotes template from the department. See email "subject: Rapport quotes"
+- Export files as Excel from Moodle Exam. Make sure the Maximum score is 20.0
+- Get the Quotes template from the department. See email "subject: Rapport quotes". Alternatively, download it from GEADE:
+  - Clique sur "Cotes et notes"
+  - Saisir sigle du cours et trimestre 20233, puis clique sur "Rechercher"
+  - Clicque sur "Cotes"
+  - Sélectionner le "Contrôle" dans la liste déroulante (devoir, article, etc)
+  - Clique sur "Télecharger les cotes"
+  - Sélectionner "Exporter cotes" dans "Type de téléchargement"
+  - Clique sur "Télécharger"
+  - Répéter pour chacun des contrôles
 """
 
 import argparse
