@@ -37,19 +37,19 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
     parser.add_argument('file-dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
 
-    parser.add_argument('--col-id-src', type=int, default=3,
+    parser.add_argument('--col-src-id', type=int, default=3,
                         help='Source column of the student ID (matricule), starting at 1')
 
-    parser.add_argument('--col-val-src', type=int, default=7,
+    parser.add_argument('--col-src-val', type=int, default=7,
                         help='Source column of the student grade, starting at 1. For GBM6125: 9.')
 
-    parser.add_argument('--row-start-src', type=int, default=1,
+    parser.add_argument('--row-src-start', type=int, default=1,
                         help='Starting row in source file, starting at 1')
 
-    parser.add_argument('--col-id-dest', type=int, default=1,
+    parser.add_argument('--col-dest-id', type=int, default=1,
                         help='Destination column of the student ID (matricule), starting at 1')
 
-    parser.add_argument('--col-val-dest', type=int, default=4,
+    parser.add_argument('--col-dest-val', type=int, default=4,
                         help='Destination column of the student grade, starting at 1')
 
     args = parser.parse_args()
@@ -93,11 +93,11 @@ def main():
     args = get_parameters()
     fname_source = args.file_src
     fname_dest = args.file_dest
-    col_id_src = args.col_id_src
-    col_val_src = args.col_val_src
-    row_start_src = args.row_start_src
-    col_id_dest = args.col_id_dest
-    col_val_dest = args.col_val_dest
+    col_src_id = args.col_src_id
+    col_src_val = args.col_src_val
+    row_src_start = args.row_src_start
+    col_dest_id = args.col_dest_id
+    col_dest_val = args.col_dest_val
 
     # Opening source Excel file
     wb1 = xl.load_workbook(fname_source, read_only=True, data_only=True)
@@ -114,9 +114,9 @@ def main():
         if all(c.value is None for c in row):
             break
 
-    for i in range(row_start_src + 1, n_row_src + 1):
+    for i in range(row_src_start + 1, n_row_src + 1):
         # Read index value from source file
-        id = ws1.cell(row=i, column=col_id_src).value
+        id = ws1.cell(row=i, column=col_src_id).value
         # Make sure the index is valid
         if not isvalid_cell(id):
             continue
@@ -124,18 +124,18 @@ def main():
             # Force it to be a string for subsequent comparison
             id = str(id)
         # Read value from source file
-        val = ws1.cell(row=i, column=col_val_src).value
+        val = ws1.cell(row=i, column=col_src_val).value
         logger.info(f"Source: matricule={id}, value={val}")
         # Find index from dest file
         found = False
         for i_row in range(1, ws2.max_row + 1):
             # Fetch matricule on destination file
-            cell = str(ws2.cell(i_row, col_id_dest).value)
+            cell = str(ws2.cell(i_row, col_dest_id).value)
             logger.debug(f"Destination: i_row={i_row}, cell={cell}")
             if cell == id:
                 found = True
                 # Assign value in destination cell
-                ws2.cell(i_row, col_val_dest).value = val
+                ws2.cell(i_row, col_dest_val).value = val
                 logger.info(f"Found matching cell! 🎉")
                 break
         if not found:
