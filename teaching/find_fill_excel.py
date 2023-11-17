@@ -31,10 +31,10 @@ finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL 
 on a column specified in this script (eg: the 'matricule' of a student).""")
 
     # Add arguments
-    parser.add_argument('--file-src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
+    parser.add_argument('file-src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
                         help='Path to the source file')
 
-    parser.add_argument('--file-dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
+    parser.add_argument('file-dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
 
     parser.add_argument('--col-id-src', type=int, default=3,
