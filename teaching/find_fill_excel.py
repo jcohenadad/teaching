@@ -31,25 +31,25 @@ finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL 
 on a column specified in this script (eg: the 'matricule' of a student).""")
 
     # Add arguments
-    parser.add_argument('--fname_source', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
+    parser.add_argument('--file-src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
                         help='Path to the source file')
 
-    parser.add_argument('--fname_dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
+    parser.add_argument('--file-dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
 
-    parser.add_argument('--col_id_src', type=int, default=3,
+    parser.add_argument('--col-id-src', type=int, default=3,
                         help='Source column of the student ID (matricule), starting at 1')
 
-    parser.add_argument('--col_val_src', type=int, default=7,
+    parser.add_argument('--col-val-src', type=int, default=7,
                         help='Source column of the student grade, starting at 1. For GBM6125: 9.')
 
-    parser.add_argument('--row_start_src', type=int, default=1,
+    parser.add_argument('--row-start-src', type=int, default=1,
                         help='Starting row in source file, starting at 1')
 
-    parser.add_argument('--col_id_dest', type=int, default=1,
+    parser.add_argument('--col-id-dest', type=int, default=1,
                         help='Destination column of the student ID (matricule), starting at 1')
 
-    parser.add_argument('--col_val_dest', type=int, default=4,
+    parser.add_argument('--col-val-dest', type=int, default=4,
                         help='Destination column of the student grade, starting at 1')
 
     args = parser.parse_args()
@@ -91,8 +91,8 @@ def main():
 
     # get input parameters
     args = get_parameters()
-    fname_source = args.fname_source
-    fname_dest = args.fname_dest
+    fname_source = args.file_src
+    fname_dest = args.file_dest
     col_id_src = args.col_id_src
     col_val_src = args.col_val_src
     row_start_src = args.row_start_src
