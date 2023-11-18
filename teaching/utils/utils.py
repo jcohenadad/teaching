@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien):
-    """Compute the weighted average grade for each response.
+    """Compute the weighted average grade for each response. Outputs a list of strings with the 
+    weighted average for each question, as well as the sum of the weighted averages, normalized to 20.
 
     Args:
         df (_type_): _description_
@@ -29,6 +30,7 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
 
     Returns:
         _type_: List of strings with the weighted average for each question
+        _type_: Sum of the weighted averages, normalized to 20
     """    """"""
     # Extract columns corresponding to graded questions
     subset_df = df[ordered_columns[col_start:col_end]]
@@ -69,7 +71,12 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
 
         averages_list.append(f"{question}: {weighted_avg:.2f}/{max_score}")
 
-    return averages_list
+    # Compute the sum of the weighted averages
+    weighted_avg_sum = sum([float(x.split('/')[0].split(': ')[1]) for x in averages_list])
+    # Normalize to a max score of 20, using the max grade for each question
+    weighted_avg_sum = weighted_avg_sum / sum([float(x.split('/')[1]) for x in averages_list]) * 20
+
+    return averages_list, weighted_avg_sum
 
 
 def expand_url(short_url):

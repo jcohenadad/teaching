@@ -69,7 +69,7 @@ def get_parameters():
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
     parser.add_argument('--compute-grade', type=str, default=None,
-                        help='Compute the grade and store it in a CSV file specified by this argument. Append to the CSV file if it already exists. When this argument is called, feedback is not sent to the student.')
+                        help='Compute the grade (/20) and store it in a CSV file specified by this argument. Append to the CSV file if it already exists. When this argument is called, feedback is not sent to the student.')
     args = parser.parse_args()
     return args
 
@@ -165,20 +165,15 @@ def main():
     df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Compute average grade for each response
-    averages_list = compute_weighted_averages(df, ordered_columns, 1, 6, MATRICULE_ID, MATRICULE_JULIEN)
+    averages_list, weighted_avg_sum = compute_weighted_averages(df, ordered_columns, 1, 6, MATRICULE_ID, MATRICULE_JULIEN)
 
     # Compute grade and store it in a CSV file
     if compute_grade:
-        # Sum all grades
-        total_grade = np.sum([float(x.split(' ')[-1]) for x in averages_list])
-        # Normalize to a max score of 20, using the max grade for each question
-        max_grade = np.sum([float(x.split(' ')[-1]) for x in averages_list if x.split(' ')[0] != 'Feedback'])
-        normalized_grade = total_grade / max_grade * 20
         # Append to CSV file
-        average_grade = f"{matricule1};{normalized_grade:.2f}"
-        # If there is a matricule2, append it
+        average_grade = f"{matricule1};{weighted_avg_sum:.2f}"
+        # If there is a matricule2, append a new row: matricule2;grade
         if matricule2:
-            average_grade += f";{matricule2}"
+            average_grade += f"\n{matricule2};{weighted_avg_sum:.2f}"
         with open(compute_grade, 'a') as f:
             f.write(average_grade + '\n')
         logger.info(f"Grade saved in {compute_grade}")
