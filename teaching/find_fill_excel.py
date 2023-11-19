@@ -43,7 +43,7 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
     parser.add_argument('--col-src-val', type=int, default=7,
                         help='Source column of the student grade, starting at 1. For GBM6125: 9.')
 
-    parser.add_argument('--row-src-start', type=int, default=1,
+    parser.add_argument('--row-src-start', type=int, default=0,
                         help='Starting row in source file, starting at 1')
 
     parser.add_argument('--col-dest-id', type=int, default=1,
