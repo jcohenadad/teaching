@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #
 # For course GBM6125. Fetch Google Form (providing ID of the form), gather and email feedback to the student.
+# That function is also used to fill a CSV file with the grades.
 #
 # How to use:
 # - Open the gsheet with the list of presentations
@@ -8,8 +9,11 @@
 # - Run this function: 
 #   > python teaching/gbm6125_send_feedback.py <MATRICULE>
 #
-# For batch run across all students, run:
-# > for matricule in 1950287 1032524 ... 1883002; do python teaching/gbm6125_send_feedback.py $matricule; done
+# For batch run across all students, first, go to the Gsheet and convert the column of matricule into a 
+# space-separated list using:
+#   =JOIN(" ", F2:F14) (replace F2:F14 with the appropriate cells)
+# Then, in the Terminal, run (after the 'in' paste the list of matricules):
+# > for matricule in ; do gbm6125_send_feedback $matricule; done
 # 
 # The file "client_secrets.json" need to be present in the working directory.
 #
@@ -38,8 +42,8 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '1SfnnVREmvhCGhxw-G0OglzYk-USI0XW8'  # ID of the folder that includes all the gforms
-SPREADSHEET_ID = '1xtsTg13huV-MpwpoDvVwuVqAXJN4lq_pcwCgPayvDn0'  # Google sheet that lists the matricules and URLs to the gforms
+FOLDER_ID = '17gfs6G0cSuKFG0UC3uFoEse6xC4hISGA'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '1ehztiWcQ8sIfktejWvxrHMYZpeDamqcrrWboy-Ha2oA'  # Google sheet that lists the matricules and URLs to the gforms
 GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
@@ -61,12 +65,14 @@ def get_parameters():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=
     "Fetch Google Form (providing ID of the form), gather and email feedback to the student.\n\n"
     "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
-    "> '=JOIN(" ", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
+    "> '=JOIN(\" \", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
     "Then, in the Terminal, run:\n"
     "> for matricule in <LIST_MATRICULE>; do gbm6125_send_feedback $matricule; done"
     )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
+    parser.add_argument('--compute-grade', type=str, default=None,
+                        help='Compute the grade (/20) and store it in a CSV file specified by this argument. Append to the CSV file if it already exists. When this argument is called, feedback is not sent to the student.')
     args = parser.parse_args()
     return args
 
@@ -80,6 +86,7 @@ def main():
     # Get input parameters
     args = get_parameters()
     matricule1 = args.matricule
+    compute_grade = args.compute_grade
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
@@ -161,8 +168,20 @@ def main():
     df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Compute average grade for each response
-    averages_list = compute_weighted_averages(df, ordered_columns, 1, 6, MATRICULE_ID, MATRICULE_JULIEN)
+    averages_list, weighted_avg_sum = compute_weighted_averages(df, ordered_columns, 1, 6, MATRICULE_ID, MATRICULE_JULIEN)
 
+    # Compute grade and store it in a CSV file
+    if compute_grade:
+        # Append to CSV file
+        average_grade = f"{matricule1};{weighted_avg_sum:.2f}"
+        # If there is a matricule2, append a new row: matricule2;grade
+        if matricule2:
+            average_grade += f"\n{matricule2};{weighted_avg_sum:.2f}"
+        with open(compute_grade, 'a') as f:
+            f.write(average_grade + '\n')
+        logger.info(f"Grade saved in {compute_grade}")
+        return
+    
     # Loop across all responses and append student's feedback
     # -------------------------------------------------------
     # Use iloc to extract feedback for the specific question by its index
