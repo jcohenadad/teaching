@@ -139,6 +139,11 @@ def main():
             id = str(id)
         # Read value from source file
         val = ws1.cell(row=i, column=col_src_val).value
+        # Make sure the value is valid and convert it to float
+        if val is None:
+            continue
+        else:
+            val = float(val)
         logger.info(f"Source: matricule={id}, value={val}")
         # Find index from dest file
         found = False
