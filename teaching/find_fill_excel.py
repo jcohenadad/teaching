@@ -112,7 +112,7 @@ def main():
         ws1 = wb1.active
         with open(fname_source, 'r') as f:
             for row in f:
-                ws1.append(row.split(','))
+                ws1.append(row.split(';'))
     else:
         logger.error("Source file should be an Excel or CSV file")
         sys.exit(1)
