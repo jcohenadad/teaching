@@ -27,12 +27,12 @@ logger.add(sys.stderr, level="INFO")
 
 def get_parameters():
     parser = argparse.ArgumentParser(description="""
-finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL file. The matching is done
+finds the value of a 'source' EXCEL or CSV file and insert it in a 'destination' EXCEL file. The matching is done
 on a column specified in this script (eg: the 'matricule' of a student).""")
 
     # Add arguments
     parser.add_argument('file-src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
-                        help='Path to the source file')
+                        help='Path to the source EXCEL or CSV file')
 
     parser.add_argument('file-dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
@@ -99,9 +99,23 @@ def main():
     col_dest_id = args.col_dest_id
     col_dest_val = args.col_dest_val
 
-    # Opening source Excel file
-    wb1 = xl.load_workbook(fname_source, read_only=True, data_only=True)
-    ws1 = wb1.active
+    # Figure out if the source file is an Excel or CSV file
+    if fname_source.endswith(('.xlsx', '.xls')):
+        logger.info("Source file is an Excel file")
+        # Opening source Excel file
+        wb1 = xl.load_workbook(fname_source, read_only=True, data_only=True)
+        ws1 = wb1.active
+    elif fname_source.endswith('.csv'):
+        logger.info("Source file is a CSV file")
+        # Opening source CSV file
+        wb1 = xl.Workbook()
+        ws1 = wb1.active
+        with open(fname_source, 'r') as f:
+            for row in f:
+                ws1.append(row.split(','))
+    else:
+        logger.error("Source file should be an Excel or CSV file")
+        sys.exit(1)
 
     # opening the destination Excel file
     wb2 = xl.load_workbook(fname_dest)
