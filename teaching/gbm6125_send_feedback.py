@@ -9,8 +9,11 @@
 # - Run this function: 
 #   > python teaching/gbm6125_send_feedback.py <MATRICULE>
 #
-# For batch run across all students, run:
-# > for matricule in 1950287 1032524 ... 1883002; do python teaching/gbm6125_send_feedback.py $matricule; done
+# For batch run across all students, first, go to the Gsheet and convert the column of matricule into a 
+# space-separated list using:
+#   =JOIN(" ", F2:F14) (replace F2:F14 with the appropriate cells)
+# Then, in the Terminal, run (after the 'in' paste the list of matricules):
+# > for matricule in ; do gbm6125_send_feedback $matricule; done
 # 
 # The file "client_secrets.json" need to be present in the working directory.
 #
@@ -39,8 +42,8 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '1SfnnVREmvhCGhxw-G0OglzYk-USI0XW8'  # ID of the folder that includes all the gforms
-SPREADSHEET_ID = '1xtsTg13huV-MpwpoDvVwuVqAXJN4lq_pcwCgPayvDn0'  # Google sheet that lists the matricules and URLs to the gforms
+FOLDER_ID = '17gfs6G0cSuKFG0UC3uFoEse6xC4hISGA'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '1ehztiWcQ8sIfktejWvxrHMYZpeDamqcrrWboy-Ha2oA'  # Google sheet that lists the matricules and URLs to the gforms
 GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
