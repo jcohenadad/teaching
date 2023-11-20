@@ -4,7 +4,8 @@ This script finds the value of a 'source' EXCEL file and insert it in a 'destina
 on a column specified in this script (eg: the 'matricule' of a student).
 
 How to use:
-- Export files as Excel from Moodle Exam. Make sure the Maximum score is 20.0
+- Export files as Excel from Moodle Exam or from Moodle Cours. Make sure the Maximum score is 20.0. To export: go to the 
+  page 'Notes', and then click on the combo box on the top left and select 'Exporter'.
 - Get the Quotes template from the department. See email "subject: Rapport quotes". Alternatively, download it from GEADE:
   - Clique sur "Cotes et notes"
   - Saisir sigle du cours et trimestre 20233, puis clique sur "Rechercher"
