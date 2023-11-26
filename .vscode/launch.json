@@ -48,5 +48,19 @@
                      "--col-src-val", "2",
                      "--col-dest-val", "4"]
         }
+        {
+            "name": "find_fill_excel - devoir",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/teaching/find_fill_excel.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/GBM6125_Notes_devoir.xlsx", 
+                     "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/Cotes_GBM6125_20233_01_Cours_DE 1_20231311.xlsx",
+                     "--col-src-id", "3",
+                     "--col-src-val", "14",
+                     "--col-dest-id", "1",
+                     "--col-dest-val", "4"]
+        }
     ]
 }
