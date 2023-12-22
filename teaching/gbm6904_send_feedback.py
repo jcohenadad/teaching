@@ -156,10 +156,10 @@ def main():
 
     # Get form responses
     results = forms_service.forms().responses().list(formId=gform_id).execute()
-    df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
+    df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata, matricule=matricule)
 
     # Compute average grade for each response
-    averages_list, weighted_avg_sum = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN)
+    averages_list, weighted_avg_sum = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN, matricule)
 
     # Compute grade and store it in a CSV file
     if compute_grade:

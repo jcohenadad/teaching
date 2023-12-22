@@ -16,7 +16,7 @@ from googleapiclient.discovery import build
 logger = logging.getLogger(__name__)
 
 
-def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien):
+def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien, matricule_student):
     """Compute the weighted average grade for each response. Outputs a list of strings with the 
     weighted average for each question, as well as the sum of the weighted averages, normalized to 20.
 
@@ -27,6 +27,7 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
         col_end (_type_): _description_
         matricule_id (_type_): _description_
         matricule_julien (_type_): _description_
+        matricule_student (_type_): Matricule of the student to compute the weighted average for
 
     Returns:
         _type_: List of strings with the weighted average for each question
@@ -59,6 +60,7 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
         # Compute the average for Julien's rows
         julien_avg = response_series[matricule_response_series == matricule_julien].mean()
         if np.isnan(julien_avg):
+            logger.error(f"julien_avg is NaN for student: {matricule_student}")
             raise ValueError("julien_avg is NaN")
 
         # Compute the average for Students' rows
@@ -93,7 +95,7 @@ def expand_url(short_url):
     return response.url
 
 
-def fetch_responses(results, result_metadata):
+def fetch_responses(results, result_metadata, matricule):
 
     # Get matriculeID of the evaluator
     matriculeId = ''
@@ -117,7 +119,11 @@ def fetch_responses(results, result_metadata):
             max_score_lookup[question_id] = scale_question.get('high', None)
 
     # Loop across responses and fill Panda dataframe
-    len_result = len(results['responses'])
+    try:
+        len_result = len(results['responses'])
+    except KeyError:
+        logger.error(f"No responses found for student: {matricule}")
+        raise RuntimeError
     # gradeStudent = []
     responses_list = []
     # max_scores_dict = {}
