@@ -38,8 +38,8 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
     parser.add_argument('file_dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
 
-    parser.add_argument('--col-src-id', type=int, default=3,
-                        help='Source column of the student ID (matricule), starting at 1. GBM6904=3')
+    parser.add_argument('--col-src-id', type=int, default=1,
+                        help='Source column of the student ID (matricule). Starts at 1. Default=1. GBM6904=3')
 
     parser.add_argument('--col-src-val', type=int, default=7,
                         help='Source column of the student grade, starting at 1. GBM6125=9, GBM6904=7')
@@ -52,6 +52,7 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
 
     parser.add_argument('--col-dest-val', type=int, default=4,
                         help='Destination column of the student grade, starting at 1. GBM6904=4')
+    parser.add_argument('--debug', action='store_true', help='Debug mode')
 
     args = parser.parse_args()
     return args
@@ -99,6 +100,12 @@ def main():
     row_src_start = args.row_src_start
     col_dest_id = args.col_dest_id
     col_dest_val = args.col_dest_val
+    logger_mode = args.debug
+
+    # Set logger mode
+    if logger_mode:
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
 
     # Figure out if the source file is an Excel or CSV file
     if fname_source.endswith(('.xlsx', '.xls')):
@@ -132,6 +139,7 @@ def main():
     for i in range(row_src_start + 1, n_row_src + 1):
         # Read index value from source file
         id = ws1.cell(row=i, column=col_src_id).value
+        logger.debug(f"Source: i={i}, id={id}")
         # Make sure the index is valid
         if not isvalid_cell(id):
             continue
