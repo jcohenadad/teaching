@@ -52,8 +52,13 @@ coloredlogs.install(fmt='%(message)s', level=LOGGING_LEVEL, logger=logger)
 
 
 def get_parameters():
-    parser = argparse.ArgumentParser(description="""
-    Fetch Google Form (providing ID of the form), gather and email feedback to the student.""")
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=
+    "Fetch Google Form (providing ID of the form), gather and email feedback to the student.\n\n"
+    "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
+    "> '=JOIN(\" \", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
+    "Then, in the Terminal, run:\n"
+    "> for matricule in <LIST_MATRICULE>; do gbm6904_send_feedback $matricule; done"
+    )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
     args = parser.parse_args()
@@ -152,6 +157,18 @@ def main():
 
     # Compute average grade for each response
     averages_list = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN)
+
+    # Compute grade and store it in a CSV file
+    if compute_grade:
+        # Append to CSV file
+        average_grade = f"{matricule1};{weighted_avg_sum:.2f}"
+        # If there is a matricule2, append a new row: matricule2;grade
+        if matricule2:
+            average_grade += f"\n{matricule2};{weighted_avg_sum:.2f}"
+        with open(compute_grade, 'a') as f:
+            f.write(average_grade + '\n')
+        logger.info(f"Grade saved in {compute_grade}")
+        return
 
     # ---------------------------------------
     # Extract columns corresponding to graded questions
