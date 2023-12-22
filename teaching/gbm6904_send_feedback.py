@@ -57,10 +57,12 @@ def get_parameters():
     "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
     "> '=JOIN(\" \", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
     "Then, in the Terminal, run:\n"
-    "> for matricule in <LIST_MATRICULE>; do gbm6904_send_feedback $matricule; done"
+    "> for matricule in <LIST_MATRICULE>; do gbm6904_send_feedback $matricule --compute-grade; done"
     )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
+    parser.add_argument('--compute-grade', type=str, default=None,
+                        help='Compute the grade (/20) and store it in a CSV file specified by this argument. Append to the CSV file if it already exists. When this argument is called, feedback is not sent to the student.')
     args = parser.parse_args()
     return args
 
