@@ -13,7 +13,7 @@ from googleapiclient.discovery import build
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("teaching")
 
 
 def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule_id, matricule_julien, matricule_student):

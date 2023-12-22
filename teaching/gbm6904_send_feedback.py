@@ -47,7 +47,7 @@ LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
 # Note: coloredlogs.install() replaces logging.BasicConfig()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(name="teaching")
 coloredlogs.install(fmt='%(message)s', level=LOGGING_LEVEL, logger=logger)
 
 
@@ -126,7 +126,8 @@ def main():
     if gform_url is not None:
         logger.info(f"Found gform URL: {gform_url}")
     else:
-        raise RuntimeError('Did not find matching gform URL.')
+        logger.error(f"Did not find matching gform URL for matricule={matricule}.")
+        raise RuntimeError("Did not find matching gform URL.")
 
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
@@ -148,6 +149,7 @@ def main():
             gform_id = item['id']
             logger.info(f"Found matched gform ID: {gform_id}")
     if gform_id == '':
+        logger.error(f"Did not find matching edit URL for matricule={matricule}.")
         raise RuntimeError('Did not find matching edit URL.')
     # gform_id = "1Bfn5PwXRnk8sMNgV2I_n7-KBYB-FQ8EMuoEeLb6r1s0"  # DEBUG JULIEN
 
