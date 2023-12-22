@@ -76,6 +76,7 @@ def main():
     # Get input parameters
     args = get_parameters()
     matricule = args.matricule
+    compute_grade = args.compute_grade
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
@@ -158,15 +159,12 @@ def main():
     df, ordered_columns = fetch_responses(results=results, result_metadata=result_metadata)
 
     # Compute average grade for each response
-    averages_list = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN)
+    averages_list, weighted_avg_sum = compute_weighted_averages(df, ordered_columns, 1, 10, MATRICULE_ID, MATRICULE_JULIEN)
 
     # Compute grade and store it in a CSV file
     if compute_grade:
         # Append to CSV file
-        average_grade = f"{matricule1};{weighted_avg_sum:.2f}"
-        # If there is a matricule2, append a new row: matricule2;grade
-        if matricule2:
-            average_grade += f"\n{matricule2};{weighted_avg_sum:.2f}"
+        average_grade = f"{matricule};{weighted_avg_sum:.2f}"
         with open(compute_grade, 'a') as f:
             f.write(average_grade + '\n')
         logger.info(f"Grade saved in {compute_grade}")
