@@ -39,10 +39,10 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
                         help='Name of the destination file')
 
     parser.add_argument('--col-src-id', type=int, default=3,
-                        help='Source column of the student ID (matricule), starting at 1')
+                        help='Source column of the student ID (matricule), starting at 1. GBM6904=3')
 
     parser.add_argument('--col-src-val', type=int, default=7,
-                        help='Source column of the student grade, starting at 1. For GBM6125: 9.')
+                        help='Source column of the student grade, starting at 1. GBM6125=9, GBM6904=7')
 
     parser.add_argument('--row-src-start', type=int, default=0,
                         help='Starting row in source file, starting at 1')
@@ -51,7 +51,7 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
                         help='Destination column of the student ID (matricule), starting at 1')
 
     parser.add_argument('--col-dest-val', type=int, default=4,
-                        help='Destination column of the student grade, starting at 1')
+                        help='Destination column of the student grade, starting at 1. GBM6904=4')
 
     args = parser.parse_args()
     return args
