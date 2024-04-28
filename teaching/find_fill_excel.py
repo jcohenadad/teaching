@@ -18,6 +18,7 @@ How to use:
 """
 
 import argparse
+import csv
 import sys
 import openpyxl as xl
 from loguru import logger
@@ -126,8 +127,8 @@ def main():
         wb1 = xl.Workbook()
         ws1 = wb1.active
         with open(fname_source, 'r') as f:
-            for row in f:
-                ws1.append(row.split(','))
+            for row in csv.reader(f, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True):
+                ws1.append(row)
     else:
         logger.error("Source file should be an Excel or CSV file")
         sys.exit(1)
