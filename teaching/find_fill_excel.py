@@ -27,9 +27,15 @@ logger.remove()
 logger.add(sys.stderr, level="INFO")
 
 def get_parameters():
+    example_commands = """
+For GBM8378 (Important: Download CSV with ',' as separator):
+find_fill_excel --debug INPUT_CSV OUTPUT_XLS
+"""
     parser = argparse.ArgumentParser(description="""
 finds the value of a 'source' EXCEL or CSV file and insert it in a 'destination' EXCEL file. The matching is done
-on a column specified in this script (eg: the 'matricule' of a student).""")
+on a column specified in this script (eg: the 'matricule' of a student).""",        
+                                     epilog=example_commands,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
 
     # Add arguments
     parser.add_argument('file_src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
@@ -38,11 +44,11 @@ on a column specified in this script (eg: the 'matricule' of a student).""")
     parser.add_argument('file_dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
                         help='Name of the destination file')
 
-    parser.add_argument('--col-src-id', type=int, default=1,
+    parser.add_argument('--col-src-id', type=int, default=3,
                         help='Source column of the student ID (matricule). Starts at 1. Default=1. GBM6904=3')
 
-    parser.add_argument('--col-src-val', type=int, default=7,
-                        help='Source column of the student grade, starting at 1. GBM6125=9, GBM6904=7')
+    parser.add_argument('--col-src-val', type=int, default=9,
+                        help='Source column of the student grade, starting at 1. GBM6125=9, GBM6904=7, GBM8378=9')
 
     parser.add_argument('--row-src-start', type=int, default=0,
                         help='Starting row in source file, starting at 1')
@@ -120,7 +126,7 @@ def main():
         ws1 = wb1.active
         with open(fname_source, 'r') as f:
             for row in f:
-                ws1.append(row.split(';'))
+                ws1.append(row.split(','))
     else:
         logger.error("Source file should be an Excel or CSV file")
         sys.exit(1)
