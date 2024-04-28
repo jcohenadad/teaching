@@ -25,7 +25,7 @@ from loguru import logger
 
 
 logger.remove()
-logger.add(sys.stderr, level="DEBUG")
+logger.add(sys.stderr, level="INFO")
 
 def get_parameters():
     help_description = """
@@ -156,6 +156,9 @@ def main():
             id = str(id)
         # Read value from source file
         val = ws1.cell(row=i, column=col_src_val).value
+        # Replace ',' by '.' in the value
+        if type(val) is str:
+            val = val.replace(',', '.')
         # Make sure the value is valid and convert it to float. If not, skip it.
         if val is None:
             logger.info(f"❌ Source: matricule={id}, value={val} (ignoring)")
