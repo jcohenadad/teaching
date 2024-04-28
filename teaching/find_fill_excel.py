@@ -39,10 +39,10 @@ find_fill_excel INPUT_CSV OUTPUT_XLS
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     # Add arguments
-    parser.add_argument('file_src', type=str, default="/Users/julien/Dropbox/documents/cours/GBM8378/2023/notes/GBM8378-2023_Final-notes.xlsx",
+    parser.add_argument('file_src', type=str,
                         help='Path to the source EXCEL or CSV file')
 
-    parser.add_argument('file_dest', type=str, default="Cotes_GBM8378_20231_01_Cours_EF_1_20230205.xlsx",
+    parser.add_argument('file_dest', type=str,
                         help='Name of the destination file')
 
     parser.add_argument('--col-src-id', type=int, default=3,
