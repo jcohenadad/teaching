@@ -24,16 +24,17 @@ from loguru import logger
 
 
 logger.remove()
-logger.add(sys.stderr, level="INFO")
+logger.add(sys.stderr, level="DEBUG")
 
 def get_parameters():
+    help_description = """
+This script finds the value of a 'source' EXCEL file and insert it in a 'destination' EXCEL file. The matching is done
+on a column specified in this script (eg: the 'matricule' of a student)."""
     example_commands = """
 For GBM8378 (Important: Download CSV with ',' as separator):
-find_fill_excel --debug INPUT_CSV OUTPUT_XLS
+find_fill_excel INPUT_CSV OUTPUT_XLS
 """
-    parser = argparse.ArgumentParser(description="""
-finds the value of a 'source' EXCEL or CSV file and insert it in a 'destination' EXCEL file. The matching is done
-on a column specified in this script (eg: the 'matricule' of a student).""",        
+    parser = argparse.ArgumentParser(description=help_description,
                                      epilog=example_commands,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
