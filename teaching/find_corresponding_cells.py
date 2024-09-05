@@ -42,11 +42,11 @@ def main():
     
     parser.add_argument("file1", help="Name of the first CSV file")
     parser.add_argument("--column1", type=int, default=0, help="Column number to match in the first file (default is 0)")
-    parser.add_argument("--delimiter1", default=",", help="Delimiter for the first file (default is ',')")
+    parser.add_argument("--delimiter1", default=";", help="Delimiter for the first file (default is ';')")
     
     parser.add_argument("file2", help="Name of the second CSV file")
-    parser.add_argument("--column2", type=int, default=1, help="Column number to match in the second file (default is 1)")
-    parser.add_argument("--delimiter2", default=",", help="Delimiter for the second file (default is ',')")
+    parser.add_argument("--column2", type=int, default=0, help="Column number to match in the second file (default is 0)")
+    parser.add_argument("--delimiter2", default=";", help="Delimiter for the second file (default is ';')")
     
     args = parser.parse_args()
     
