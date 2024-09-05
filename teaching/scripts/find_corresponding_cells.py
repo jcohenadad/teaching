@@ -38,7 +38,7 @@ def find_non_correspondence(file1: str, column1: int, delimiter1: str, file2: st
     return non_correspondence1, non_correspondence2
 
 def main():
-    parser = argparse.ArgumentParser(description="Find non-corresponding lines between two CSV files based on specified columns.")
+    parser = argparse.ArgumentParser(description="Find non-corresponding lines between two CSV files based on specified columns. This script is useful to see new students in an updated list of students.")
     
     parser.add_argument("file1", help="Name of the first CSV file")
     parser.add_argument("--column1", type=int, default=0, help="Column number to match in the first file (default is 0)")
