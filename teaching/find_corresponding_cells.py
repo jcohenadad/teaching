@@ -10,12 +10,17 @@ def read_csv(filename: str, column_number: int, delimiter: str) -> List[str]:
     Read a CSV file and return the data in the specified column as a list.
     """
     data = []
-    with open(filename, 'r') as f:
-        reader = csv.reader(f, delimiter=delimiter)
-        for row in reader:
-            if len(row) > column_number:
-                data.append(row[column_number])
+    try:
+        # Specify the encoding to handle non-UTF-8 encoded files
+        with open(filename, mode='r', encoding='ISO-8859-1') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if len(row) > column_number:
+                    data.append(row[column_number])
+    except UnicodeDecodeError:
+        print("UnicodeDecodeError: Unable to decode the file. Please check the file encoding.")
     return data
+
 
 def find_non_correspondence(file1: str, column1: int, delimiter1: str, file2: str, column2: int, delimiter2: str) -> Tuple[List[int], List[int]]:
     """
