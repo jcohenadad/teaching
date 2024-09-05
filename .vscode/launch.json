@@ -62,5 +62,16 @@
                      "--col-dest-id", "1",
                      "--col-dest-val", "4"]
         }
+        {
+            "name": "find_corresponding_cells",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/teaching/find_corresponding_cells.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6904_seminaires/2024/GBM6904-20243-01C.CSV", 
+                     "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6904_seminaires/2024/GBM6904-20243-01C_20240905_142319.CSV"
+                    ]
+        }
     ]
 }
