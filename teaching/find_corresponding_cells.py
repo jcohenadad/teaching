@@ -57,8 +57,8 @@ def main():
     
     non_correspondence1, non_correspondence2 = find_non_correspondence(args.file1, args.column1, args.delimiter1, args.file2, args.column2, args.delimiter2)
     
-    print(f"Lines in {args.file1} that do not have a corresponding match in {args.file2}: {non_correspondence1}")
-    print(f"Lines in {args.file2} that do not have a corresponding match in {args.file1}: {non_correspondence2}")
+    print(f"Lines in {args.file1} that do not have a corresponding match in {args.file2}: \n{non_correspondence1}")
+    print(f"Lines in {args.file2} that do not have a corresponding match in {args.file1}: \n{non_correspondence2}")
 
 if __name__ == '__main__':
     main()
