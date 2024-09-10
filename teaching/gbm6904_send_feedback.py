@@ -28,11 +28,12 @@ import pickle
 import coloredlogs
 
 from requests import get
-from google.auth.transport import requests
+from google.auth.transport.requests import Request
+from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from .utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
+from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message, fetch_email_address, compute_weighted_averages
 
 
 # Parameters
@@ -97,15 +98,20 @@ def main():
     # If there are no (valid) credentials available, prompt the user to log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            request = requests.Request()
-            creds.refresh(request)
+            try:
+                creds.refresh(Request())
+            except RefreshError:
+                print("Refresh token is invalid or expired. Deleting token.pickle and re-authenticating...")
+                os.remove(token_path)  # Delete the invalid token
+                flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
+                creds = flow.run_local_server(port=8080)
         else:
+            print("No valid credentials found. Re-authenticating...")
             flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
-            # Open a browser window for authentication
             creds = flow.run_local_server(port=8080)
 
         # Save the credentials for future runs
-        with open('token.pickle', 'wb') as token:
+        with open(token_path, 'wb') as token:
             pickle.dump(creds, token)
 
     # Build the forms_service objects for both APIs
