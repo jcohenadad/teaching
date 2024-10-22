@@ -139,6 +139,10 @@ def main():
     # Get expanded URL from shorten URL (listed in gsheet)
     gform_url_expanded = expand_url(gform_url)
 
+    # Remove query parameters from the URL
+    gform_url_expanded = gform_url_expanded.split('?')[0]
+    logger.info(f"Expanded URL: {gform_url_expanded}")
+
     results = drive_service.files().list(q=f"'{FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.form'",
                                         fields="files(id, name)").execute()
     items = results.get('files', [])
