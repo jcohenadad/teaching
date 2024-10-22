@@ -42,8 +42,8 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '17gfs6G0cSuKFG0UC3uFoEse6xC4hISGA'  # ID of the folder that includes all the gforms
-SPREADSHEET_ID = '1ehztiWcQ8sIfktejWvxrHMYZpeDamqcrrWboy-Ha2oA'  # Google sheet that lists the matricules and URLs to the gforms
+FOLDER_ID = '13YlbPfYjvkCLBUgF8WyhoB-bFwrTIjWy'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '1IRlMzaoNDaJEEO2FqKjT2KCdDVdrR3asHmpYv9djZok'  # Google sheet that lists the matricules and URLs to the gforms
 GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
@@ -52,7 +52,7 @@ FEEDBACK_ID = 6  # ID of the question corresponding to the feedback
 MATRICULE_JULIEN = '000000'
 # TODO: have the address below in local config files
 EMAIL_FROM = "jcohen@polymtl.ca"
-PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2023/notes/GBM6125-20233-01C.CSV"
+PATH_CSV = "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2024/GBM6125-20243-01C.CSV"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
@@ -203,7 +203,8 @@ def main():
     feedback = julien_feedback + other_feedback
 
     # Indicate the number of students who responded (to check inconsistencies with the number of students in the class)
-    logger.info(f"\nNumber of responses: {len(results['responses'])}\n")
+    logger.info(f"Number of responses: {len(results['responses'])}\n")
+    logger.info(f"Matricules: {[matricule1, matricule2]}\n")
 
     # Email feedback to student
     for matricule in [matricule1, matricule2]:

@@ -21,7 +21,8 @@
             "program": "${workspaceRoot}/teaching/gbm6125_send_feedback.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["2246984", "--compute-grade", "oral.csv"]
+            // "args": ["2087875", "--compute-grade", "oral.csv"]
+            "args": ["2087875"]
         }
         {
             "name": "find_fill_excel.py",
