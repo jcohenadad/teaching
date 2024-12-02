@@ -172,6 +172,10 @@ def main():
 
     # Compute grade and store it in a CSV file
     if compute_grade:
+        # Check if the file exists, and if it does not, add header 'matricule;note'
+        if not os.path.exists(compute_grade):
+            with open(compute_grade, 'w') as f:
+                f.write('matricule;note\n')
         # Append to CSV file
         average_grade = f"{matricule1};{weighted_avg_sum:.2f}"
         # If there is a matricule2, append a new row: matricule2;grade
@@ -180,6 +184,7 @@ def main():
         with open(compute_grade, 'a') as f:
             f.write(average_grade + '\n')
         logger.info(f"Grade saved in {compute_grade}")
+        # Quit the function here (do not send email)
         return
     
     # Loop across all responses and append student's feedback
