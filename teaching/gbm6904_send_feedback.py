@@ -176,6 +176,10 @@ def main():
 
     # Compute grade and store it in a CSV file
     if compute_grade:
+        # Check if the file exists, and if it does not, add header 'matricule;note'
+        if not os.path.exists(compute_grade):
+            with open(compute_grade, 'w') as f:
+                f.write('matricule;note\n')
         # Append to CSV file
         average_grade = f"{matricule};{weighted_avg_sum:.2f}"
         with open(compute_grade, 'a') as f:
