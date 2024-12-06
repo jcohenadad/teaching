@@ -86,7 +86,7 @@ def main():
         percentage_of_max = (cutoff / args.max_grade) * 100.0
         # Compute how many students are in this "band"
         count_in_category = count_current - previous_count
-        print(f"{label}: {grade_cutoff:.2f} (raw), {percentage_of_max:.2f}% of max (n= {count_in_category})")
+        print(f"{label}: {grade_cutoff:.2f} -> {percentage_of_max:.2f}% (n= {count_in_category})")
         previous_count = count_current
 
 if __name__ == "__main__":
