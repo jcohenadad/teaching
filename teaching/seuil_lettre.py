@@ -1,4 +1,22 @@
-# Author: Robin Demesmaeker
+# The script reads a text file that has a series of grades (in single column), between 0 and 20, 
+# and that outputs the threshold for the letter grade, according to the following rule based
+# on the percentile of grades:
+# >=90%: A*
+# >=70%: A
+# >=50%: B+
+# >=30%: B
+# >=20%: C+
+# >=10%: C
+# >=5%: D+
+# >=1%: F
+# 
+# These thresholds are parametrizable (eg: as input parameter in argparse).
+# 
+# The output of the script gives the threshold, in percentage of the grade between 0 and 100%. 
+# For example, if the threshold to get an A* is 18.0, then the output threshold for A* would be 90%.
+# 
+# Author: Julien Cohen-Adad
+
 
 import argparse
 
@@ -52,16 +70,24 @@ def main():
     # Sort grades
     grades.sort()
 
-    # Compute and print thresholds
-    print("Letter Grade Thresholds:")
+    # Compute thresholds
+    threshold_data = []
     for label, p in thresholds:
         grade_cutoff = percentile_grade(grades, p)
-        if grade_cutoff is None:
+        count_at_or_above = sum(1 for g in grades if grade_cutoff is not None and g >= grade_cutoff)
+        threshold_data.append((label, grade_cutoff, count_at_or_above))
+
+    print("Letter Grade Thresholds:")
+    previous_count = 0
+    for (label, cutoff, count_current) in threshold_data:
+        if cutoff is None:
             print(f"{label}: No data available")
             continue
-        # Convert grade cutoff to percentage of max grade
-        percentage_of_max = (grade_cutoff / args.max_grade) * 100.0
-        print(f"{label}: {grade_cutoff:.2f} (raw), {percentage_of_max:.2f}% of max")
+        percentage_of_max = (cutoff / args.max_grade) * 100.0
+        # Compute how many students are in this "band"
+        count_in_category = count_current - previous_count
+        print(f"{label}: {grade_cutoff:.2f} (raw), {percentage_of_max:.2f}% of max (n= {count_in_category})")
+        previous_count = count_current
 
 if __name__ == "__main__":
     main()
