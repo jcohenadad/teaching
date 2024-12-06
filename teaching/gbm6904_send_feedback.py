@@ -59,7 +59,8 @@ def get_parameters():
     "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
     "> '=JOIN(\" \", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
     "Then, in the Terminal, run:\n"
-    "> for matricule in <LIST_MATRICULE>; do gbm6904_send_feedback $matricule --compute-grade oral.csv; done"
+    "> matricules=MATRICULE1 MATRICULE2 MATRICULE3 ...\n"
+    "> for matricule in $matricules; do gbm6904_send_feedback $matricule --compute-grade oral.csv; done\n"
     )
     parser.add_argument('matricule',
                         help="Student matricule. Used to fetch the email address.")
