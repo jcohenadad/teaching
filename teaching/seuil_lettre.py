@@ -1,6 +1,6 @@
 # The script reads a text file that has a series of grades (in single column), between 0 and 20, 
 # and that outputs the threshold for the letter grade, according to the following rule based
-# on the percentile of grades:
+# on the percentile of grades, example:
 # >=90%: A*
 # >=70%: A
 # >=50%: B+
@@ -55,7 +55,7 @@ def main():
     parser.add_argument("file_grades", type=str, help="Path to the file containing grades.")
     parser.add_argument("--max-grade", type=float, default=20.0, help="Maximum possible grade.")
     parser.add_argument("--thresholds", nargs="+", 
-                        default=["A*:0.9","A:0.7","B+:0.5","B:0.3","C+:0.2","C:0.1","D+:0.05","F:0.01"],
+                        default=["A*:0.9","A:0.6","B+:0.4","B:0.2","C+:0.1","C:0.05","D+:0.02","F:0.01"],
                         help='List of threshold definitions in the format "LABEL:PERCENTILE". '
                              'Example: "A*:0.9" "A:0.7" etc.')
     args = parser.parse_args()
