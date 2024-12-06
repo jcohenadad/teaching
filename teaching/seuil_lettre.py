@@ -15,6 +15,13 @@
 # The output of the script gives the threshold, in percentage of the grade between 0 and 100%. 
 # For example, if the threshold to get an A* is 18.0, then the output threshold for A* would be 90%.
 # 
+# HOW TO USE:
+# - Export the grades from Moodle (grades between 0-20)
+# - Open in Numbers or Excel
+# - Select the column with all the grades
+# - Copy and paste in TXT file.
+# - Run current script and input TXT file. 
+# 
 # Author: Julien Cohen-Adad
 
 
