@@ -1,31 +1,48 @@
+#!/usr/bin/env python3
+# 
 # The script reads a text file that has a series of grades (in single column), between 0 and 20, 
 # and that outputs the threshold for the letter grade, according to the following rule based
-# on the percentile of grades, example:
-# >=90%: A*
-# >=70%: A
-# >=50%: B+
-# >=30%: B
-# >=20%: C+
-# >=10%: C
-# >=5%: D+
-# >=1%: F
+# on the percentile of grades. 
 # 
-# These thresholds are parametrizable (eg: as input parameter in argparse).
-# 
-# The output of the script gives the threshold, in percentage of the grade between 0 and 100%. 
-# For example, if the threshold to get an A* is 18.0, then the output threshold for A* would be 90%.
-# 
-# HOW TO USE:
-# - Export the grades from Moodle (grades between 0-20)
-# - Open in Numbers or Excel
-# - Select the column with all the grades
-# - Copy and paste in TXT file.
-# - Run current script and input TXT file. 
-# 
+# For more details, run python seuil_lettre.py --help
 # Author: Julien Cohen-Adad
 
 
 import argparse
+
+DESCRIPTION = """\
+The script reads a text file that has a series of grades (in single column),
+between 0 and 20, and outputs the threshold for the letter grade, according
+to a rule based on the percentile of grades. Example mapping:
+
+  >=90%: A*
+  >=70%: A
+  >=50%: B+
+  >=30%: B
+  >=20%: C+
+  >=10%: C
+  >=5%:  D+
+  >=1%:  F
+
+These thresholds are configurable via the --thresholds argument.
+
+The output of the script gives the threshold in percentage of the maximum
+grade (by default 20). For example, if the threshold to get A* is 18.0 
+(when the max grade is 20), then the output for A* would be 90%.
+
+HOW TO USE:
+  - Go to Moodle -> Notes -> Exporter
+  - Export under 'Fichier texte', 
+    - select the final grade (0 to 20)
+    - 'Type d'affichage' = 'Brut'
+    - 'Séparateur' = 'Point virgule'
+  - Open in Numbers or Excel
+  - Select the column with all the grades
+  - Copy and paste into a TXT file
+  - Run this script and provide the TXT file as input.
+
+Author: Julien Cohen-Adad
+"""
 
 def parse_thresholds(threshold_list):
     """
@@ -58,7 +75,7 @@ def percentile_grade(sorted_grades, percentile):
     return sorted_grades[idx]
 
 def main():
-    parser = argparse.ArgumentParser(description="Compute letter grade thresholds based on percentile ranks.")
+    parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("file_grades", type=str, help="Path to the file containing grades.")
     parser.add_argument("--max-grade", type=float, default=20.0, help="Maximum possible grade.")
     parser.add_argument("--thresholds", nargs="+", 
