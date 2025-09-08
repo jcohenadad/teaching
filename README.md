@@ -26,17 +26,11 @@ source activate teaching
 pip install -e .
 ~~~
 
-Tips: add alias in your bashrc/zshrc (for Tab completion):
-~~~
-alias send_feedback="send_feedback"
-~~~
-
 # Usage
 
 ## GBM6904/7904
 
 - **Send feedback to student:** Go to Google Sheet that lists all presenters, fetch the required data and run:  
   ~~~
-  send_feedback <MATRICULE> <URL>
+  send_feedback <MATRICULE>
   ~~~
-  
