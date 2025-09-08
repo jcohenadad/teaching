@@ -9,6 +9,8 @@ https://pythonhosted.org/PyDrive/quickstart.html#authentication
 
 - Enable [Google Forms API](https://console.developers.google.com/apis/api/forms.googleapis.com/overview?project=1036953068115)
 - Enable [Gmail API](https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=1036953068115)
+- [Download your OAuth 2.0 Client ID JSON from Google Cloud Console](https://console.cloud.google.com/apis/dashboard) and place it at the root of the repository (ie: where the file `setup.py` is located).
+
 
 # GBM6904
 
