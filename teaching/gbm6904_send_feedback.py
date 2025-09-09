@@ -37,14 +37,14 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '1I7S-RHJ9WgQAGa51RuVmRhe2sddHPrqa'  # ID of the Google folder that includes all the gforms (go to the folder, click on "Open in new window", and copy the ID from the URL)
-SPREADSHEET_ID = '1fOREGH2EFc1gxTDMrMwmhjX-QBk20BvqncugHvy85lE'  # Google sheet that lists the matricules and URLs to the gforms
-PATH_CSV = "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6904_seminaires/2024/GBM6904-20243-01C.CSV"  # Path to the CSV file that links matricule to email address
+FOLDER_ID = '15-pYefoq4trDOHNOZEndT3jLWlkdutJU'  # ID of the Google folder that includes all the gforms (go to the folder, click on "Open in new window", and copy the ID from the URL)
+SPREADSHEET_ID = '1iE2GIMf269My5WaUNFEJLkvSI15E6tUiT7hGMo-iHKU'  # Google sheet that lists the matricules and URLs to the gforms
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2025/GBM6904-20253-01C.CSV"  # Path to the CSV file that links matricule to email address
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
 MATRICULE_JULIEN = '000000'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
-EMAIL_FROM = "jcohen@polymtl.ca"
+EMAIL_FROM = "julien.cohen-adad@polymtl.ca"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
