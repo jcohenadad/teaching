@@ -62,8 +62,8 @@ def get_parameters():
     "> matricules=MATRICULE1 MATRICULE2 MATRICULE3 ...\n"
     "> for matricule in $matricules; do gbm6904_send_feedback $matricule --compute-grade oral.csv; done\n"
     )
-    parser.add_argument('matricule',
-                        help="Student matricule. Used to fetch the email address.")
+    parser.add_argument('--matricule', type=str, default=None,
+                        help="Student matricule. If not provided, you will be prompted.")
     parser.add_argument('--compute-grade', type=str, default=None,
                         help='Compute the grade (/20) and store it in a CSV file specified by this argument. Append to the CSV file if it already exists. When this argument is called, feedback is not sent to the student.')
     args = parser.parse_args()
@@ -80,6 +80,9 @@ def main():
     args = get_parameters()
     matricule = args.matricule
     compute_grade = args.compute_grade
+
+    if matricule is None:
+        matricule = input("Enter the student's matricule: ").strip()
 
     SCOPES = [
         "https://www.googleapis.com/auth/drive",
