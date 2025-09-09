@@ -34,5 +34,5 @@ pip install -e .
 
 - **Send feedback to student:** Go to Google Sheet that lists all presenters, fetch the required data and run:  
   ~~~
-  send_feedback <MATRICULE>
+  send_feedback
   ~~~

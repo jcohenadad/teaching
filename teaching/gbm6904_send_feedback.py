@@ -7,7 +7,7 @@
 # - Open the gsheet with the list of presentations
 # - Copy the matricule of the first presenting student
 # - Run this function: 
-#   > python teaching/gbm6904_send_feedback.py <MATRICULE>
+#   > python teaching/gbm6904_send_feedback.py
 #
 # The file "client_secrets.json" need to be present in the working directory.
 #
