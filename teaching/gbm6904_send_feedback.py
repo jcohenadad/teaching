@@ -44,7 +44,7 @@ MATRICULE_ID = 0  # ID of the question corresponding to the matricule
 MATRICULE_JULIEN = '000000'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
 # TODO: have the address below in local config files
-EMAIL_FROM = "julien.cohen-adad@polymtl.ca"
+EMAIL_FROM = "julien.cohenadad@gmail.com"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging

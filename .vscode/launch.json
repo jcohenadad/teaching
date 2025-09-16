@@ -11,8 +11,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/teaching/gbm6904_send_feedback.py",
             "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": ["2074061"]
+            "justMyCode": true
         }
         {
             "name": "gbm6125_send_feedback.py",
