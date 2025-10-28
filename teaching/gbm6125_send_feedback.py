@@ -15,7 +15,7 @@
 #   =JOIN(" ", F2:F14) (replace F2:F14 with the appropriate cells)
 # Then, in the Terminal, run:
 # > matricules="<PASTE_ALL_MATRICULES_HERE>"
-# > for matricule in $matricules; do gbm6125_send_feedback "$matricules"; done
+# > for matricule in $matricules; do gbm6125_send_feedback "$matricule"; done
 # 
 # The file "client_secrets.json" need to be present in the working directory.
 #
