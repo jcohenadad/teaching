@@ -4,6 +4,7 @@
 # That function is also used to fill a CSV file with the grades.
 #
 # How to use:
+# - Update variables: FOLDER_ID | SPREADSHEET_ID | PATH_CSV
 # - Open the gsheet with the list of presentations
 # - Copy the matricule of the first presenting student
 # - Run this function: 
@@ -12,8 +13,9 @@
 # For batch run across all students, first, go to the Gsheet and convert the column of matricule into a 
 # space-separated list using:
 #   =JOIN(" ", F2:F14) (replace F2:F14 with the appropriate cells)
-# Then, in the Terminal, run (after the 'in' paste the list of matricules):
-# > for matricule in ; do gbm6125_send_feedback $matricule; done
+# Then, in the Terminal, run:
+# > matricules="<PASTE_ALL_MATRICULES_HERE>"
+# > for matricule in $matricules; do gbm6125_send_feedback "$matricules"; done
 # 
 # The file "client_secrets.json" need to be present in the working directory.
 #
@@ -42,8 +44,9 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '13YlbPfYjvkCLBUgF8WyhoB-bFwrTIjWy'  # ID of the folder that includes all the gforms
-SPREADSHEET_ID = '1IRlMzaoNDaJEEO2FqKjT2KCdDVdrR3asHmpYv9djZok'  # Google sheet that lists the matricules and URLs to the gforms
+FOLDER_ID = '1FKvGMqIbRHVCcZUmD_daHajEQ5w6PByV'  # ID of the folder that includes all the gforms
+SPREADSHEET_ID = '1BkSiVzo0xqUQUd38Rt5oKpUf6CWdCkfz-592SCByNBQ'  # Google sheet that lists the matricules and URLs to the gforms
+PATH_CSV = "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2024/GBM6125-20243-01C.CSV"
 GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
@@ -51,8 +54,7 @@ MATRICULE_ID = 0  # ID of the question corresponding to the matricule
 FEEDBACK_ID = 6  # ID of the question corresponding to the feedback
 MATRICULE_JULIEN = '000000'
 # TODO: have the address below in local config files
-EMAIL_FROM = "jcohen@polymtl.ca"
-PATH_CSV = "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2024/GBM6125-20243-01C.CSV"
+EMAIL_FROM = "julien.cohenadad@gmail.com"
 LOGGING_LEVEL = 'INFO'  # 'DEBUG', 'INFO'
 
 # Initialize colored logging
