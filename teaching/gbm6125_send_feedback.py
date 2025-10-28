@@ -46,7 +46,7 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 # Parameters
 FOLDER_ID = '1FKvGMqIbRHVCcZUmD_daHajEQ5w6PByV'  # ID of the folder that includes all the gforms
 SPREADSHEET_ID = '1BkSiVzo0xqUQUd38Rt5oKpUf6CWdCkfz-592SCByNBQ'  # Google sheet that lists the matricules and URLs to the gforms
-PATH_CSV = "/Users/julien/Library/CloudStorage/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2025/GBM6125-20253-01C.CSV"
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6125_basesGenieBiomed/2025/GBM6125-20253-01C.CSV"
 GSHEET_COLUMN_URL = 2  # column corresponding to the gform URL (starts at 0)
 GSHEET_COLUMN_MATRICULE = 5  # column corresponding to the matricule
 GSHEET_COLUMN_MATRICULE2 = 8  # column corresponding to the matricule of the 2nd student
