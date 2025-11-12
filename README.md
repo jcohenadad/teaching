@@ -36,3 +36,22 @@ pip install -e .
   ~~~
   send_feedback
   ~~~
+
+## GBM6125
+
+[Send feedback to students](https://github.com/jcohenadad/teaching/blob/16bc379bcb0b2f71a1ede707fb0519a52ca3f17e/teaching/gbm6125_send_feedback.py#L6)
+
+### Generate CSV with oral grades
+
+For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:
+~~~
+=JOIN(" ", F2:F14) (replace F2:F14 with the appropriate cells)
+~~~
+
+Then, in the Terminal, run:
+
+~~~
+source venv/bin/activate
+matricules="<PASTE_ALL_MATRICULES_HERE>"
+for matricule in $matricules; do gbm6125_send_feedback "$matricule" --compute-grade notes_oral.csv; done
+~~~
