@@ -75,7 +75,16 @@ def percentile_grade(sorted_grades, percentile):
     return sorted_grades[idx]
 
 def main():
-    parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
+    example_text = """\
+Examples:
+  python seuil_lettre.py grades.txt
+  python seuil_lettre.py grades.txt --max-grade 100
+  python seuil_lettre.py grades.txt --thresholds A*:0.95 A:0.8 B:0.6 C:0.4 D:0.2 F:0.0
+"""
+    parser = argparse.ArgumentParser(
+        description=DESCRIPTION,
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog=example_text)
     parser.add_argument("file_grades", type=str, help="Path to the file containing grades.")
     parser.add_argument("--max-grade", type=float, default=20.0, help="Maximum possible grade.")
     parser.add_argument("--thresholds", nargs="+", 
