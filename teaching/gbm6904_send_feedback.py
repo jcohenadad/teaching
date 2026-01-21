@@ -6,8 +6,14 @@
 # - Make sure the Parameters (below) are set correctly
 # - Open the gsheet with the list of presentations
 # - Copy the matricule of the first presenting student
-# - Run this function: 
+# - To send individual feedback:
 #   > python teaching/gbm6904_send_feedback.py
+# - To generate grades for all students and store them in a CSV file
+#   Go to the Gsheet and convert the column of matricule into a space-separated list using:
+#   =JOIN(" ", B2:B14) (replace with the appropriate cells)
+#   Then, in the Terminal, run:
+#   > matricules="<PASTE_ALL_MATRICULES_HERE>"
+#   > for matricule in $matricules; do gbm6904_send_feedback --matricule "$matricule" --compute-grade oral.csv; done
 #
 # The file "client_secrets.json" need to be present in the working directory.
 #
@@ -57,10 +63,10 @@ def get_parameters():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=
     "Fetch Google Form (providing ID of the form), gather and email feedback to the student.\n\n"
     "For batch run across all students, first, go to the Gsheet and convert the column of matricule into a space-separated list using:\n"
-    "> '=JOIN(\" \", F2:F14)' (replace F2:F14 with the appropriate cells)\n"
+    "> '=JOIN(\" \", B2:B14)' (replace with the appropriate cells)\n"
     "Then, in the Terminal, run:\n"
     "> matricules=MATRICULE1 MATRICULE2 MATRICULE3 ...\n"
-    "> for matricule in $matricules; do gbm6904_send_feedback $matricule --compute-grade oral.csv; done\n"
+    "> for matricule in $matricules; do gbm6904_send_feedback --matricule $matricule --compute-grade oral.csv; done\n"
     )
     parser.add_argument('--matricule', type=str, default=None,
                         help="Student matricule. If not provided, you will be prompted.")
