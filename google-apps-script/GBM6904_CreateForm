@@ -23,12 +23,13 @@
 // - Use trigger: https://codeburst.io/automating-google-forms-sheets-using-apps-script-2c59db97966f
 
 // Parameters to setup
-const SpreadSheet = "15FNkWQOkIUHWwm3QYLregszKL_usMO_U35hmS4TMv-I"
-const OutputFolder = "GBM6904-2022_GoogleForms"
+const SpreadSheet = "1_W2tOTgMkSquudjRT9TgOV8XPDk0FbWW0hlH3uYNCb4"
+const YearLabel = "GBM6904-2026"
+const OutputFolder = YearLabel + "_GoogleForms"
 const indexStart = 1  // If "Exceeded maximum execution time" is encountered, change this to the index to start from and re-run the script.
 
 // Script starts here
-var folder=DriveApp.getFoldersByName(OutputFolder).next();
+var folder = DriveApp.getFoldersByName(OutputFolder).next();
 
 function createForm() {
   // Fetch names of all students
@@ -36,10 +37,18 @@ function createForm() {
   // Loop across students
   for(j = indexStart; j < googleSheetsValues.length; j++)
   {
+    // Sheet columns: Date(A), Matricule(B), FirstName(C), LastName(D), Program(E), GoogleForms(F)
+    var Matricule = googleSheetsValues[j][1];
+    var FirstName = googleSheetsValues[j][2];
+    var LastName = googleSheetsValues[j][3];
+
+    // Skip rows with no student (e.g. "Pas de cours" weeks, or weeks already linked to a shared form)
+    if (!Matricule) {
+      continue;
+    }
+
     // create & name Form
-    var FirstName = googleSheetsValues[j][1];
-    var LastName = googleSheetsValues[j][2];
-    var form = FormApp.create("GBM6904-2022_" + FirstName + LastName)
+    var form = FormApp.create(YearLabel + "_" + FirstName + LastName)
                       .setTitle("Étudiant.e : " + FirstName + " " + LastName)
                       .setDescription("Ce formulaire est utilisé pour noter la présentation. Veuillez inclure des commentaires constructifs à la fin.");
 
@@ -121,7 +130,7 @@ function createForm() {
     var formUrlLong = form.getPublishedUrl();
     var formUrlShort = form.shortenFormUrl(formUrlLong);    
     var ss = SpreadsheetApp.openById(SpreadSheet);
-    ss.getSheetByName('Sheet1').getRange(j+1,5).setValue(formUrlShort);
+    ss.getSheetByName('Sheet1').getRange(j+1,6).setValue(formUrlShort);
   }
 }
 
