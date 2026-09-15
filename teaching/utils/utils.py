@@ -154,22 +154,24 @@ def fetch_responses(results, result_metadata, matricule):
     return df, ordered_columns
 
 
-def fetch_email_address(matricule: str, path_csv: str) -> str:
+def fetch_email_address(matricule: str, path_csv: str, delimiter: str = ';', col_matricule: int = 0, col_email: int = 3) -> str:
     """
     Find email address of student based on their matricule, using a CSV file that is provided by the university.
-    This function assumes the following CSV structure:
-        matricule | Last name | First name | email
+    Default column layout (old registrar export): matricule | Last name | First name | email
 
     :param matricule:
     :param path_csv: CSV file that contains matricule and email address of students. Provided by the university.
+    :param delimiter: CSV field delimiter (e.g. ';' for the registrar export, ',' for a Moodle participants export).
+    :param col_matricule: Column index of the matricule field.
+    :param col_email: Column index of the email field.
     :return: email_addr: Email address of student
     """
     # encoding='latin-1' is required because of non utf-8 characters in the CSV file (accents, etc.)
     with open(path_csv, newline='', encoding='latin-1') as csvfile:
-        reader = csv.reader(csvfile, delimiter=';')
+        reader = csv.reader(csvfile, delimiter=delimiter)
         for row in reader:
-            if row[0] == matricule:
-                return row[3]
+            if len(row) > max(col_matricule, col_email) and row[col_matricule] == matricule:
+                return row[col_email]
         # If email was not found, raise error
         logger.error('Did not found email from the CSV file with matricule: {}'.format(matricule))
         raise RuntimeError

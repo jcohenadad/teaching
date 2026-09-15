@@ -43,9 +43,13 @@ from teaching.utils.utils import fetch_responses, expand_url, gmail_send_message
 
 
 # Parameters
-FOLDER_ID = '15-pYefoq4trDOHNOZEndT3jLWlkdutJU'  # ID of the Google folder that includes all the gforms (go to the folder, click on "Open in new window", and copy the ID from the URL)
-SPREADSHEET_ID = '1iE2GIMf269My5WaUNFEJLkvSI15E6tUiT7hGMo-iHKU'  # Google sheet that lists the matricules and URLs to the gforms
-PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2025/GBM6904-20253-01C.CSV"  # Path to the CSV file that links matricule to email address
+FOLDER_ID = '1lxrm7-k2JvHTWb-bhsKCEKRJ9U5_mwFj'  # ID of the Google folder that includes all the gforms (go to the folder, click on "Open in new window", and copy the ID from the URL)
+SPREADSHEET_ID = '1_W2tOTgMkSquudjRT9TgOV8XPDk0FbWW0hlH3uYNCb4'  # Google sheet that lists the matricules and URLs to the gforms
+PATH_CSV = "/Users/julien/Dropbox/documents/cours/GBM6904_seminaires/2026/courseid_5167_participants.csv"  # Path to the CSV file that links matricule to email address
+# This year's CSV is a Moodle participants export: Prénom,Nom de famille,Matricule,Adresse de courriel,Groupes
+CSV_DELIMITER = ','
+CSV_COL_MATRICULE = 2
+CSV_COL_EMAIL = 3
 MATRICULE_ID = 0  # ID of the question corresponding to the matricule
 MATRICULE_JULIEN = '000000'
 FEEDBACK_ID = 11  # ID of the question corresponding to the feedback
@@ -137,6 +141,8 @@ def main():
     values = result.get('values', [])
     gform_url = None
     for row in values:
+        if len(row) <= max(INPUT_COLUMN_INDEX, OUTPUT_COLUMN_INDEX):
+            continue  # skip short/empty rows (e.g. "Pas de cours" weeks)
         if row[INPUT_COLUMN_INDEX] == matricule:
             gform_url = row[OUTPUT_COLUMN_INDEX]
             break
@@ -249,7 +255,7 @@ def main():
     logger.info(f"\nNumber of responses: {len(results['responses'])}\n")
 
     # Email feedback to student
-    email_to = fetch_email_address(matricule, PATH_CSV)
+    email_to = fetch_email_address(matricule, PATH_CSV, delimiter=CSV_DELIMITER, col_matricule=CSV_COL_MATRICULE, col_email=CSV_COL_EMAIL)
     email_subject = '[GBM6904/7904] Feedback sur ta présentation orale'
     email_body = (
         f"Bonjour,\n\n"
