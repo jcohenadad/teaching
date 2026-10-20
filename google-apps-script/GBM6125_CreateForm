@@ -4,6 +4,7 @@
 // - Fetches a Google Sheet that lists all groups (specific format for the sheet is required)
 // - Loops across students
 // - For each group, generate a Google Form and put it under OutputFolder
+// - Add the link of the Google Form on the Google Spreadsheet
 // 
 // Before running:
 // - Update URL to Google Sheet
@@ -22,27 +23,51 @@
 // - https://codewithcurt.com/populate-options-on-google-forms-from-google-sheets/
 // - Use trigger: https://codeburst.io/automating-google-forms-sheets-using-apps-script-2c59db97966f
 
+
 // Parameters to setup
-const SpreadSheet = "1X6ZjZy0dUceHaT5cZys5AQtCVl9WXUASo4o47QeLQis"
-const OutputFolder = "GBM6125-2022_GoogleForms"
+const SpreadSheet = "1GUEJDHVRsEesIba0Bq7EeNm3SdycJIiJibIPu8NGPwM"  // Google spreadsheet that lists presenting students, where the gform URLs needs to be inserted
+const OutputFolder = "GBM6125-2026_GoogleForms"
 const indexStart = 1  // If "Exceeded maximum execution time" is encountered, change this to the index to start from and re-run the script.
 
 // Script starts here
-var folder=DriveApp.getFoldersByName(OutputFolder).next();
+// Output folder is created next to the Google Sheet (e.g. Cours/GBM6125/2026/GBM6125-2026_GoogleForms)
+function getOutputFolder() {
+  var parentFolder = DriveApp.getFileById(SpreadSheet).getParents().next();
+  var existing = parentFolder.getFoldersByName(OutputFolder);
+  return existing.hasNext() ? existing.next() : parentFolder.createFolder(OutputFolder);
+}
+
+// One-off helper: move an OutputFolder created elsewhere (e.g. My Drive root) next to the Google Sheet
+function moveOutputFolder() {
+  var parentFolder = DriveApp.getFileById(SpreadSheet).getParents().next();
+  var it = DriveApp.getFoldersByName(OutputFolder);
+  while (it.hasNext()) {
+    var f = it.next();
+    if (f.getParents().next().getId() != parentFolder.getId()) {
+      f.moveTo(parentFolder);
+      Logger.log("Moved " + f.getName() + " to " + parentFolder.getName());
+    }
+  }
+}
 
 function createForm() {
+  var folder = getOutputFolder();
   // Fetch names of all students
   var googleSheetsValues = getValueFromGoogleSheet();
   // Loop across students
   for(j = indexStart; j < googleSheetsValues.length; j++)
   {
     // create & name Form
-    var Group = googleSheetsValues[j][0];
-    var FirstName1 = googleSheetsValues[j][1];
-    var LastName1 = googleSheetsValues[j][2];
-    var FirstName2 = googleSheetsValues[j][3];
-    var LastName2 = googleSheetsValues[j][4];
-    var form = FormApp.create("GBM6125-2022_" + FirstName1 + LastName2)
+    var Semaine = googleSheetsValues[j][0];
+    var Groupe = googleSheetsValues[j][1];
+    var FirstName1 = googleSheetsValues[j][3];
+    var LastName1 = googleSheetsValues[j][4];
+    var Matricule1 = googleSheetsValues[j][5];
+    var FirstName2 = googleSheetsValues[j][6];
+    var LastName2 = googleSheetsValues[j][7];
+    var Matricule2 = googleSheetsValues[j][8];
+    if (!FirstName1 && !LastName1) continue;  // skip empty rows
+    var form = FormApp.create("GBM6125-2026_" + Semaine + "-" + Groupe + "_" + Matricule1 + "_" + Matricule2)
                       .setTitle("Étudiants : " + FirstName1 + " " + LastName1 + " & " + FirstName2 + " " + LastName2)
                       .setDescription("Ce formulaire est utilisé pour noter la présentation.");
 
@@ -59,14 +84,14 @@ function createForm() {
         .setLabels("Mauvais", "Excellent")
         .setRequired(true);  
     form.addScaleItem()  
-        .setTitle("2. Revue de litérature")
-        .setHelpText("Litterature review")  // TODO: put this in italic
+        .setTitle("2. Qualité des diapositives")
+        .setHelpText("Quality of the slides")  // TODO: put this in italic
         .setBounds(1, 3)
         .setLabels("Mauvais", "Excellent")
         .setRequired(true);  
     form.addScaleItem()  
-        .setTitle("3. Structure de la présentation")
-        .setHelpText("Structure of the presentation")  // TODO: put this in italic
+        .setTitle("3. Contenu global de la présentation (contextualisation, revue de litérature, etc.)")
+        .setHelpText("Global content (contextualization, literature review, etc.)")  // TODO: put this in italic
         .setBounds(1, 5)
         .setLabels("Mauvais", "Excellent")
         .setRequired(true);  
@@ -82,7 +107,11 @@ function createForm() {
         .setBounds(1, 3)
         .setLabels("Mauvais", "Excellent")
         .setRequired(true);  
-    
+    form.addTextItem()
+        .setTitle("S'il vous plaît donnez un retour constructif à l'étudiant.e (anonyme)")
+        .setHelpText("Please provide constructive feedback to the student (anonymous)")
+        .setRequired(false);
+
     // Save form in output folder
     saveItemInFolder(form,folder);
 
@@ -90,7 +119,7 @@ function createForm() {
     var formUrlLong = form.getPublishedUrl();
     var formUrlShort = form.shortenFormUrl(formUrlLong);    
     var ss = SpreadsheetApp.openById(SpreadSheet);
-    ss.getSheetByName('Sheet1').getRange(j+1,7).setValue(formUrlShort);
+    ss.getSheetByName('Sheet1').getRange(j+1,3).setValue(formUrlShort);
   }
 }
 
@@ -117,3 +146,145 @@ function saveItemInFolder(item,folder) {
 }
 
 
+
+
+// =====================================================================================
+// Feedback to students (port of teaching/gbm6125_send_feedback.py, runs inside Google)
+//
+// 1. Set FEEDBACK_SEMAINE, then run buildFeedback(): it reads the responses of each
+//    group's gform for that week, computes the weighted grades (50% teacher, 50% class)
+//    and writes one row per student (email text included) in the spreadsheet
+//    "GBM6125-2026_Feedback", created next to the orals sheet.
+// 2. Fill the "Email" column (Moodle participants list), and review the emails.
+// 3. Run sendFeedback(): sends every row that has an email and is not yet marked as sent,
+//    then writes the date in the "Envoyé" column (so re-running never sends twice).
+// =====================================================================================
+const FEEDBACK_SEMAINE = 1;  // Week whose groups receive their feedback
+const MATRICULE_JULIEN = '000000';
+const FEEDBACK_SHEET_NAME = 'GBM6125-2026_Feedback';
+const FEEDBACK_HEADER = ['Semaine', 'Groupe', 'Matricule', 'Étudiant', 'Email', 'Nb réponses', 'Note /20', 'Corps du courriel', 'Envoyé', 'Remarque'];
+const EMAIL_SUBJECT = '[GBM6125] Feedback sur ta présentation orale';
+
+function getFeedbackSheet_() {
+  var parentFolder = DriveApp.getFileById(SpreadSheet).getParents().next();
+  var it = parentFolder.getFilesByName(FEEDBACK_SHEET_NAME);
+  var ss;
+  if (it.hasNext()) {
+    ss = SpreadsheetApp.open(it.next());
+  } else {
+    ss = SpreadsheetApp.create(FEEDBACK_SHEET_NAME);
+    DriveApp.getFileById(ss.getId()).moveTo(parentFolder);
+    ss.getSheets()[0].appendRow(FEEDBACK_HEADER);
+    ss.getSheets()[0].setFrozenRows(1);
+  }
+  return ss.getSheets()[0];
+}
+
+function findGroupForm_(folder, semaine, groupe) {
+  var prefix = 'GBM6125-2026_' + semaine + '-' + groupe + '_';
+  var files = folder.getFilesByType(MimeType.GOOGLE_FORMS);
+  while (files.hasNext()) {
+    var f = files.next();
+    if (f.getName().indexOf(prefix) === 0) return FormApp.openById(f.getId());
+  }
+  return null;
+}
+
+function mean_(arr) {
+  return arr.reduce(function (a, b) { return a + b; }, 0) / arr.length;
+}
+
+// Same computation as compute_weighted_averages() + feedback ordering in the Python script
+function computeGroupFeedback_(form) {
+  var items = form.getItems();
+  var matItem = items.filter(function (it) { return it.getTitle() === 'Votre matricule étudiant :'; })[0];
+  var scaleItems = items.filter(function (it) { return it.getType() === FormApp.ItemType.SCALE; });
+  var responses = form.getResponses();
+  if (responses.length === 0) throw new Error('Aucune réponse au formulaire');
+
+  var rows = responses.map(function (r) {
+    var row = { matricule: '', scores: {}, feedback: '' };
+    r.getItemResponses().forEach(function (ir) {
+      var id = ir.getItem().getId();
+      if (matItem && id === matItem.getId()) row.matricule = String(ir.getResponse()).trim();
+      else if (ir.getItem().getType() === FormApp.ItemType.SCALE) row.scores[id] = Number(ir.getResponse());
+      else if (ir.getItem().getType() === FormApp.ItemType.TEXT || ir.getItem().getType() === FormApp.ItemType.PARAGRAPH_TEXT) row.feedback = String(ir.getResponse()).trim();
+    });
+    return row;
+  });
+  var isJulien = function (row) { return row.matricule === MATRICULE_JULIEN; };
+  if (!rows.some(isJulien)) throw new Error("Pas de réponse de l'enseignant (matricule " + MATRICULE_JULIEN + ')');
+
+  var lines = [], sumW = 0, sumMax = 0;
+  scaleItems.forEach(function (it) {
+    var id = it.getId(), high = it.asScaleItem().getUpperBound();
+    var j = rows.filter(isJulien).map(function (r) { return r.scores[id]; }).filter(function (v) { return !isNaN(v); });
+    var s = rows.filter(function (r) { return !isJulien(r); }).map(function (r) { return r.scores[id]; }).filter(function (v) { return !isNaN(v); });
+    if (j.length === 0) throw new Error("Pas de note de l'enseignant pour : " + it.getTitle());
+    if (s.length === 0) throw new Error('Pas de note des étudiants pour : ' + it.getTitle());
+    var w = Number((0.5 * mean_(j) + 0.5 * mean_(s)).toFixed(2));
+    lines.push(it.getTitle() + ': ' + w.toFixed(2) + '/' + high);
+    sumW += w; sumMax += high;
+  });
+  var feedback = rows.filter(isJulien).map(function (r) { return r.feedback; })
+    .concat(rows.filter(function (r) { return !isJulien(r); }).map(function (r) { return r.feedback; }))
+    .filter(function (f) { return f !== ''; });
+
+  var body = 'Bonjour,\n\n' +
+    'Voici le résultat de la présentation que tu as donnée dans le cadre du cours GBM6125.\n\n' +
+    'Voici tes notes par critère (pondération : 50% enseignant, 50% moyenne de la classe) :\n\n' + lines.join('\n') + '\n\n' +
+    "Et voici le feedback de l'enseignant suivi du feedback des étudiants:\n\n" + '- ' + feedback.join('\n- ') + '\n\nJulien Cohen-Adad';
+  return { body: body, nResponses: responses.length, grade: Number((sumW / sumMax * 20).toFixed(2)) };
+}
+
+function buildFeedback() {
+  var folder = getOutputFolder();
+  var values = getValueFromGoogleSheet();
+  var sheet = getFeedbackSheet_();
+  var existing = sheet.getDataRange().getValues().map(function (r) { return r[0] + '|' + r[2]; });
+  for (var j = 1; j < values.length; j++) {
+    var v = values[j];
+    if (String(v[0]) !== String(FEEDBACK_SEMAINE) || (!v[3] && !v[4])) continue;
+    var students = [[v[5], v[3] + ' ' + v[4]], [v[8], v[6] + ' ' + v[7]]].filter(function (s) { return String(s[0]).trim() !== ''; });
+    var res, remark = '';
+    try {
+      var form = findGroupForm_(folder, v[0], v[1]);
+      if (!form) throw new Error('Formulaire introuvable');
+      res = computeGroupFeedback_(form);
+    } catch (e) {
+      res = { body: '', nResponses: '', grade: '' };
+      remark = 'ERREUR : ' + e.message;
+    }
+    students.forEach(function (s) {
+      var key = v[0] + '|' + s[0];
+      var idx = existing.indexOf(key);
+      var row = [v[0], v[1], String(s[0]), String(s[1]).replace(/\s+/g, ' ').trim(), '', res.nResponses, res.grade, res.body, '', remark];
+      if (idx > 0) {
+        // Refresh computed columns, keep Email and Envoyé
+        var old = sheet.getRange(idx + 1, 1, 1, FEEDBACK_HEADER.length).getValues()[0];
+        if (old[8]) return;  // already sent: never touch
+        row[4] = old[4];
+        sheet.getRange(idx + 1, 1, 1, row.length).setValues([row]);
+      } else {
+        sheet.appendRow(row);
+        existing.push(key);
+      }
+    });
+    Logger.log('Semaine ' + v[0] + ' groupe ' + v[1] + ' : ' + (remark || (res.nResponses + ' réponses, note ' + res.grade + '/20')));
+  }
+}
+
+function sendFeedback() {
+  var sheet = getFeedbackSheet_();
+  var data = sheet.getDataRange().getValues();
+  var nSent = 0;
+  for (var i = 1; i < data.length; i++) {
+    var r = data[i];
+    if (String(r[0]) !== String(FEEDBACK_SEMAINE) || r[8] || !r[4] || !r[7] || r[9]) continue;
+    GmailApp.sendEmail(String(r[4]).trim(), EMAIL_SUBJECT, r[7]);
+    sheet.getRange(i + 1, 9).setValue(new Date());
+    nSent++;
+    Logger.log('Envoyé à ' + r[3] + ' (' + r[4] + ')');
+  }
+  Logger.log(nSent + ' courriel(s) envoyé(s).');
+}
