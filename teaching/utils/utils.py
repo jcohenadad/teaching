@@ -55,7 +55,7 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
         matricule_series = df.iloc[:, matricule_id]
 
         # Extracting just the response value from matricule_series
-        matricule_response_series = matricule_series.apply(lambda x: x['response'] if isinstance(x, dict) else None)
+        matricule_response_series = matricule_series.apply(lambda x: str(x['response']).strip() if isinstance(x, dict) else None)
 
         # Compute the average for Julien's rows
         julien_avg = response_series[matricule_response_series == matricule_julien].mean()
@@ -63,8 +63,8 @@ def compute_weighted_averages(df, ordered_columns, col_start, col_end, matricule
             logger.error(f"julien_avg is NaN for student: {matricule_student}")
             raise ValueError("julien_avg is NaN")
 
-        # Compute the average for Students' rows
-        student_avg = response_series[matricule_series != matricule_julien].mean()
+        # Compute the average for Students' rows (excluding Julien's rows)
+        student_avg = response_series[matricule_response_series != matricule_julien].mean()
         if np.isnan(student_avg):
             raise ValueError("student_avg is NaN")
 
